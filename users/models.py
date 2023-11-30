@@ -9,6 +9,18 @@ from .managers import CustomUserManager
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    STUDENT = 1
+    GUARDIAN = 2
+    ORGANIZER = 3
+    ADMIN = 4
+
+    USER_TYPE_CHOICES = (
+        (1, 'student'),
+        (2, 'guardian'),
+        (3, 'organizer'),
+        (4, 'admin'),
+    )
+
     email = models.EmailField(_("email address"), unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -17,6 +29,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=False)
     data_joined = models.DateTimeField(default=timezone.now)
     description = models.TextField()
+    user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, default=STUDENT)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
