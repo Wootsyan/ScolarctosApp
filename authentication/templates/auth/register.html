@@ -6,43 +6,77 @@
 <div class="login-area">
     <div class="container">
         <div class="login-box ptb--100">
-            <form>
+            <form id="registerForm" method="post">
+                {% csrf_token %}
                 <div class="login-form-head">
                     <image class="mb-2" src="{% static "assets/images/custom/logo-koala.png" %}">
                     <h4>Rejestracja</h4>
                     <p>Zarejestruj się i dołącz do nas</p>
                 </div>
                 <div class="login-form-body">
+                    {{ form.non_field_errors }}
                     <div class="form-gp">
-                        <label for="exampleInputName1">Full Name</label>
-                        <input type="text" id="exampleInputName1">
+                        <label for="{{ form.first_name.id_for_label }}">Imię</label>
+                        {{ form.first_name }}
                         <i class="ti-user"></i>
-                        <div class="text-danger"></div>
+                        <div class="text-danger">{{ form.first_name.errors }}</div>
                     </div>
                     <div class="form-gp">
-                        <label for="exampleInputEmail1">Adres e-mail</label>
-                        <input type="email" id="exampleInputEmail1">
+                        <label for="{{ form.last_name.id_for_label }}">Nazwisko</label>
+                        {{ form.last_name }}
+                        <i class="ti-user"></i>
+                        <div class="text-danger">{{ form.last_name.errors }}</div>
+                    </div>
+                    <div class="form-gp">
+                        <label for="{{ form.email.id_for_label }}">Adres e-mail</label>
+                        {{ form.email }}
                         <i class="ti-email"></i>
-                        <div class="text-danger"></div>
+                        <div class="text-danger">{{ form.email.errors }}</div>
                     </div>
                     <div class="form-gp">
-                        <label for="exampleInputPassword1">Hasło</label>
-                        <input type="password" id="exampleInputPassword1">
+                        <label for="{{ form.password1.id_for_label }}">Hasło</label>
+                        {{ form.password1 }}
                         <i class="ti-lock"></i>
-                        <div class="text-danger"></div>
+                        <div class="text-danger">{{ form.password1.errors }}</div>
                     </div>
                     <div class="form-gp">
-                        <label for="exampleInputPassword2">Powtórz hasło</label>
-                        <input type="password" id="exampleInputPassword2">
+                        <label for="{{ form.password2.id_for_label }}">Powtórz hasło</label>
+                        {{ form.password2 }}
                         <i class="ti-lock"></i>
-                        <div class="text-danger"></div>
+                        <div class="text-danger">{{ form.password2.errors }}</div>
+                    </div>
+                    <div class="form-gp">
+                        {{ form.user_type }}
+                        <div class="text-danger">{{ form.user_type.errors }}</div>
                     </div>
                     <div class="submit-btn-area">
-                        <button id="form_submit" type="submit">Submit <i class="ti-arrow-right"></i></button>
+                        <button id="form_submit" type="submit">Utwórz konto <i class="ti-arrow-right"></i></button>
                     </div>
                     <div class="form-footer text-center mt-5">
-                        <p class="text-muted">Masz już konto? <a href="{% url "login" %}">Zalogu się</a></p>
+                        <p class="text-muted">Masz już konto? <a href="{% url "login" %}">Zaloguj się</a></p>
                     </div>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="registerSuccessMessage" tabindex="-1" role="dialog" aria-labelledby="registerSuccessMessageLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="registerSuccessMessageLabel">Rejestracja przebiegła pomyślnie!</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Link aktywacyjny przesłaliśmy na wskazany adres e-mail.<br />
+          Sprawdź swoją skrzynkę pocztową w celu aktywowania konta.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Strona główna</button>
+          <button type="button" class="btn btn-primary">Logowanie</button>
+        </div>
+      </div>
+    </div>
+  </div>
                 </div>
             </form>
         </div>
@@ -50,3 +84,11 @@
 </div>
 <!-- login area end -->
 {% endblock content %}
+{% block additionalscripts %}
+{% if success %}
+<script>
+    $('#registerForm')[0].reset();
+    $('#registerSuccessMessage').modal();
+</script>
+{% endif %}
+{% endblock additionalscripts %}

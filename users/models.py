@@ -15,16 +15,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     ADMIN = 4
 
     USER_TYPE_CHOICES = (
-        (1, 'student'),
-        (2, 'guardian'),
-        (3, 'organizer'),
-        (4, 'admin'),
+        (STUDENT, 'Uczeń'),
+        (GUARDIAN, 'Opiekun'),
+        (ORGANIZER, 'Organizator'),
+        (ADMIN, 'Administrator'),
     )
 
     email = models.EmailField(_("email address"), unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=9, validators=[MinLengthValidator], unique=True)
+    phone_number = models.CharField(max_length=9, validators=[MinLengthValidator], unique=True, null=True, default=None)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     data_joined = models.DateTimeField(default=timezone.now)
@@ -38,3 +38,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+    
+    class Meta:
+        verbose_name = _("user")
+        verbose_name_plural = _("users")
