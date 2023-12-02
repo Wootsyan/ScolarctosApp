@@ -57,22 +57,19 @@
                     </div>
   
   <!-- Modal -->
-  <div class="modal fade" id="registerSuccessMessage" tabindex="-1" role="dialog" aria-labelledby="registerSuccessMessageLabel" aria-hidden="true">
+  <div class="modal fade" id="registerSuccessMessage" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="registerSuccessMessageLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header justify-content-center">
           <h5 class="modal-title" id="registerSuccessMessageLabel">Rejestracja przebiegła pomyślnie!</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body text-center">
           Link aktywacyjny przesłaliśmy na wskazany adres e-mail.<br />
           Sprawdź swoją skrzynkę pocztową w celu aktywowania konta.
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Strona główna</button>
-          <button type="button" class="btn btn-primary">Logowanie</button>
+        <div class="modal-footer justify-content-center">
+          <a href="#" class="btn btn-info" role="button" aria-pressed="true">Strona główna</a>
+          <a href="{% url "login" %}" class="btn btn-primary" role="button" aria-pressed="true">Logowanie</a>
         </div>
       </div>
     </div>
