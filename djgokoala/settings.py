@@ -26,6 +26,7 @@ VERIFICATION_EXPIRE_MINUTES = 60
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+SITE_URL = 'http://127.0.0.1:8000'
 ALLOWED_HOSTS = []
 
 
@@ -66,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'djgokoala.context_processors.site',
             ],
         },
     },
@@ -73,6 +75,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djgokoala.wsgi.application'
 
+# Email
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = 'acb3c1bb87fb7a'
+EMAIL_HOST_PASSWORD = '7c3666c0343030'
+EMAIL_PORT = '2525'
+DEFAULT_FROM_EMAIL = 'admin@koala.pl'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
