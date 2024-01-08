@@ -1,12 +1,8 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect
-from django.core.mail import EmailMultiAlternatives
-from django.utils.html import strip_tags
-from django.template.loader import render_to_string
-from django.conf import settings
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 from .forms import RegisterForm
-from .utils import generate_token, check_token
+from .utils import check_token, send_verification_mail
 
 def redirect_auth_user(request):
     if request.user.is_authenticated:
@@ -25,31 +21,42 @@ def register(request):
             form = RegisterForm(request.POST)
             if form.is_valid():
                 user = form.save()
-                email_verify_token = generate_token(user.id, user.email)
-                email_data = {
-                    'user_name': user.first_name,
-                    'verification_time': settings.VERIFICATION_EXPIRE_MINUTES,
-                    'verification_url': settings.SITE_URL + reverse('verify_email', args=(user.id, email_verify_token))
-                } 
-
-                html_message = render_to_string("auth/email/email-confirmation.html", email_data, request=request)
-                plain_message = strip_tags(html_message)
-                mail = EmailMultiAlternatives(
-                    subject="Potwierdź swoje konto - Zespół Koala",
-                    body=plain_message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[user.email],
-                )
-                mail.attach_alternative(html_message, "text/html")
-                mail.send()
                 form = RegisterForm()
-                return render(request, 'auth/register.html', {'form': form, 'success': True})
+                status = send_verification_mail(to_user=user)
+                if status:
+                    return render(request, 'auth/register.html', {'form': form, 'success': True})          
         else:
             form = RegisterForm()
         return render(request, 'auth/register.html', {'form': form})
     
-def verify_email(request, user_id, token):
-    pass
+def verify_email(request, user_id=None, token=None):
+    if request.method == 'POST':
+        email = request.POST['email']
+        try:
+            user = get_user_model().objects.get(email=email)
+        except get_user_model().models.CustomUser.DoesNotExist:
+            user = None
+        status = False
+        if user is not None and not user.is_active:
+            status = send_verification_mail(to_user=user)
+        if status:
+            url = reverse('verify_email_resend_link') + '?verifylinksend=1'
+        else:
+            url = reverse('verify_email_resend_link')
+        return redirect(url)
+    
+    else:
+        if 'verifylinksend' in request.GET:
+            return render(request, 'auth/verify-email.html', {'verifylinksend': True})
+        else:
+            decoded_token = check_token(token=token)
+            if decoded_token and decoded_token['user_id'] == user_id:
+                user = get_user_model().objects.get(pk=user_id)
+                if not user.is_active:
+                    user.is_active = True
+                    user.save()
+                    return render(request, 'auth/verify-email.html', {'status': True})
 
-# def emailtest(request):
-#     return render(request, 'auth/email/email-confirmation.html')
+            else:
+                return render(request, 'auth/verify-email.html', {'status': False})
+            
