@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'authentication',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +56,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'djgokoala.urls'
 AUTH_USER_MODEL = "users.CustomUser"
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.AllowAllUsersModelBackend']
 
 TEMPLATES = [
     {

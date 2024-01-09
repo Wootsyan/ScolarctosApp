@@ -1,0 +1,10 @@
+.user-profile .user-thumb i{
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
+    display: block;
+    border-radius: 50%;
+    text-align: center;
+    color: #fff;
+    font-size: 23px;
+}

@@ -6,25 +6,39 @@
 <div class="login-area">
     <div class="container">
         <div class="login-box ptb--100">
-            <form>
+            <form method="post">
+                {% csrf_token %}
                 <div class="login-form-head">
                     <image class="mb-2" src="{% static "assets/images/custom/logo-koala.png" %}">
                     <h4>Logowanie</h4>
                     <p>Zaloguj się do panelu Koala</p>
                 </div>
                 <div class="login-form-body">
+                    {{ form.non_field_errors }}
                     <div class="form-gp">
-                        <label for="exampleInputEmail1">Adres e-mail</label>
-                        <input type="email" id="exampleInputEmail1">
+                        <label for="{{ form.email.id_for_label }}">Adres e-mail</label>
+                        {{ form.email }}
                         <i class="ti-email"></i>
-                        <div class="text-danger"></div>
+                        <div class="text-danger">{{ form.email.errors }}</div>
                     </div>
                     <div class="form-gp">
-                        <label for="exampleInputPassword1">Hasło</label>
-                        <input type="password" id="exampleInputPassword1">
+                        <label for="{{ form.password.id_for_label }}">Hasło</label>
+                        {{ form.password }}
                         <i class="ti-lock"></i>
-                        <div class="text-danger"></div>
+                        <div class="text-danger">{{ form.password.errors }}</div>
                     </div>
+                    {% if error_login_message %}
+                    <div class="row mb-4 rmber-area">
+                        <div class="col-12">
+                            <div class="custom-control custom-checkbox mr-sm-2 mb-2 text-danger text-center">
+                                {{ error_login_message }}
+                            </div>
+                            {% if inactive_user %}
+                            <a href="{% url "verify_email_resend_link" %}" role="button" class="btn btn-rounded btn-info btn-lg btn-block mb-3">Aktywuj konto</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
                     <div class="row mb-4 rmber-area">
                         <div class="col-6">
                             <div class="custom-control custom-checkbox mr-sm-2">

@@ -1,6 +1,7 @@
 from django import forms
 from users.forms import CustomUserCreationForm
 from users.models import CustomUser
+from django.utils.translation import gettext_lazy as _
 
 class RegisterForm(CustomUserCreationForm):
     SELECTED_USER_TYPE_CHOICES = (
@@ -17,3 +18,11 @@ class RegisterForm(CustomUserCreationForm):
     class Meta:
         model = CustomUser
         fields = ('email', 'first_name', 'last_name', 'user_type')
+
+class LoginForm(forms.Form):
+    email = forms.EmailField(label=_("Email"), max_length=254)
+    password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
+
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'password',)
