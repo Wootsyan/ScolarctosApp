@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth import get_user_model, authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.forms import SetPasswordForm
 from .forms import RegisterForm, LoginForm
-from .utils import check_token, send_verification_mail
+from .utils import check_token, send_verification_mail, send_reset_password_mail
 
 def redirect_auth_user(request):
     if request.user.is_authenticated:
@@ -90,4 +91,44 @@ def verify_email(request, user_id=None, token=None):
 
                 else:
                     return render(request, 'auth/verify-email.html', {'status': False})
+                
+def password_reset_request(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard:index')
+    else:
+        if request.method == 'POST':
+            email = request.POST['email']
+            try:
+                user = get_user_model().objects.get(email=email)
+            except get_user_model().models.CustomUser.DoesNotExist:
+                user = None
+            resetlinksend = False
+            if user is not None:
+                resetlinksend = send_reset_password_mail(to_user=user)
+
+            return render(request, 'auth/password-reset-request.html', {'resetlinksend': resetlinksend})
+
+        else:
+            return render(request, 'auth/password-reset-request.html', {'resetlinksend': False})
+
+def password_reset_change(request, user_id, token):
+    if request.method == 'POST':
+        user = get_user_model().objects.get(pk=user_id)
+        form = SetPasswordForm(user=user, data=request.POST)
+        
+        if form.is_valid():
+            form.save()
+            return render(request, 'auth/password-reset.html', {'password_changed': True})
+        
+        return render(request, 'auth/password-reset.html', {'form': form})
             
+    else:
+        decoded_token = check_token(token=token)
+        if decoded_token and decoded_token['user_id'] == user_id:
+            user = get_user_model().objects.get(pk=user_id)
+            form = SetPasswordForm(user)
+            return render(request, 'auth/password-reset.html', {'form': form})
+        else:
+            return render(request, 'auth/password-reset.html', {'token_error': True})
+    
+    

@@ -2,6 +2,7 @@ from django import forms
 from users.forms import CustomUserCreationForm
 from users.models import CustomUser
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.forms import SetPasswordForm
 
 class RegisterForm(CustomUserCreationForm):
     SELECTED_USER_TYPE_CHOICES = (
@@ -26,3 +27,4 @@ class LoginForm(forms.Form):
     class Meta:
         model = CustomUser
         fields = ('email', 'password',)
+    
