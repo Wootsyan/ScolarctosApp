@@ -57,6 +57,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'djgokoala.urls'
 AUTH_USER_MODEL = "users.CustomUser"
 AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.AllowAllUsersModelBackend']
+LOGIN_URL = '/auth/login/'
 
 TEMPLATES = [
     {

@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth import get_user_model, authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.models import Group
 from .forms import RegisterForm, LoginForm
 from .utils import check_token, send_verification_mail, send_reset_password_mail
+from users.models import CustomGroup
 
 def redirect_auth_user(request):
     if request.user.is_authenticated:
@@ -50,6 +52,8 @@ def register(request):
             form = RegisterForm(request.POST)
             if form.is_valid():
                 user = form.save()
+                user_group = Group.objects.get(name=CustomGroup.names[user.user_type-1])
+                user_group.user_set.add(user)
                 form = RegisterForm()
                 status = send_verification_mail(to_user=user)
                 if status:

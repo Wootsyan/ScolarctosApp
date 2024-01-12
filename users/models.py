@@ -42,3 +42,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _("user")
         verbose_name_plural = _("users")
+
+class CustomGroup():
+    names = [
+        "Students",
+        "Guardians",
+        "Organizers",
+        "Admins",
+    ]
