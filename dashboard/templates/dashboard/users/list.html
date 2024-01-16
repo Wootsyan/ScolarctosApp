@@ -12,7 +12,18 @@
                 <div class="col-12 mt-5">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="header-title">Lista użytkowników</h4>
+                            <div class="row mb-3">
+                                <div class="col-lg-6">
+                                    <h4 class="header-title">Lista użytkowników</h4>
+                                </div>
+                                <div class="col-lg-6 d-flex justify-content-lg-end">
+                                    {% if page_type == 'admins' and perms.users.add_admins %}
+                                    <a href="{% url "dashboard:users-admins-new" %}" class="btn btn-primary" role="button" aria-pressed="true">Utwórz nowe konto</a>
+                                    {% elif page_type == 'organizers' and perms.users.add_organizers %}
+                                    <a href="{% url "dashboard:users-organizers-new" %}" class="btn btn-primary" role="button" aria-pressed="true">Utwórz nowe konto</a>
+                                    {% endif %}
+                                </div>
+                            </div>
                             {% if users_list %}
                             <div class="data-tables datatable-dark">
                                 <table id="dataTableUsers" class="text-center">

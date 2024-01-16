@@ -52,7 +52,7 @@ def register(request):
             form = RegisterForm(request.POST)
             if form.is_valid():
                 user = form.save()
-                user_group = Group.objects.get(name=CustomGroup.names[user.user_type-1])
+                user_group = Group.objects.get(name=CustomGroup.names[user.user_type])
                 user_group.user_set.add(user)
                 form = RegisterForm()
                 status = send_verification_mail(to_user=user)

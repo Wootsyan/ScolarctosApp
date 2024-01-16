@@ -54,9 +54,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ]
 
 class CustomGroup():
-    names = [
-        "Students",
-        "Guardians",
-        "Organizers",
-        "Admins",
-    ]
+    names = {
+        CustomUser.STUDENT: "Students",
+        CustomUser.GUARDIAN: "Guardians",
+        CustomUser.ORGANIZER: "Organizers",
+        CustomUser.ADMIN: "Admins",
+    }

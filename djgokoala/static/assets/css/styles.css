@@ -704,7 +704,6 @@ ul.breadcrumbs {
 .breadcrumbs li span {
     margin-right: 0;
     color: #768387;
-    text-transform: capitalize;
 }
 
 .user-profile {
@@ -842,7 +841,6 @@ ul.breadcrumbs {
     font-weight: 600;
     letter-spacing: 0;
     color: #333;
-    text-transform: capitalize;
     margin-bottom: 17px;
 }
 
