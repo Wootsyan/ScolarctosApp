@@ -1,0 +1,93 @@
+{% extends "dashboard/base.html" %}
+{% block meta_title %}Lista {{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+<li><a>Użytkownicy</a></li>
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+        <div class="main-content-inner">
+            <div class="row">
+                <!-- Dark table start -->
+                <div class="col-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title">Lista użytkowników</h4>
+                            {% if users_list %}
+                            <div class="data-tables datatable-dark">
+                                <table id="dataTableUsers" class="text-center">
+                                    <thead class="">
+                                        <tr>
+                                            <th class="desktop">Adres e-mail</th>
+                                            <th class="desktop">Imię</th>
+                                            <th class="desktop">Nazwisko</th>
+                                            <th class="desktop">Numer telefonu</th>
+                                            <th class="desktop">Data dołączenia</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users_list %}
+                                        <tr>
+                                            <td>{{ user.email }}</td>
+                                            <td>{{ user.first_name }}</td>
+                                            <td>{{ user.last_name }}</td>                                            
+                                            <td>{{ user.phone_number|default_if_none:"Brak" }}</td>
+                                            <td>{{ user.data_joined|date:"Y-m-d" }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %} 
+                            <p class="text-danger">Lista użytkowników jest pusta</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Dark table end -->
+            </div>
+        </div>
+{% endblock content %}
+{% block additionalthemecss %}
+<!-- Start datatable css -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.jqueryui.min.css">
+{% endblock additionalthemecss %}
+{% block additionalthemescripts %}
+<!-- Start datatable js -->
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+<script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
+<script>
+    new DataTable('#dataTable3', {
+        language: {
+            processing: 'Traitement en cours...',
+            search: 'Rechercher&nbsp;:',
+            lengthMenu: 'Afficher _MENU_ &eacute;l&eacute;ments',
+            info: "Affichage de l'&eacute;lement _START_ &agrave; _END_ sur _TOTAL_ &eacute;l&eacute;ments",
+            infoEmpty: "Affichage de l'&eacute;lement 0 &agrave; 0 sur 0 &eacute;l&eacute;ments",
+            infoFiltered: '(filtr&eacute; de _MAX_ &eacute;l&eacute;ments au total)',
+            infoPostFix: '',
+            loadingRecords: 'Chargement en cours...',
+            zeroRecords: 'Aucun &eacute;l&eacute;ment &agrave; afficher',
+            emptyTable: 'Aucune donnée disponible dans le tableau',
+            paginate: {
+                first: 'Premier',
+                previous: 'Pr&eacute;c&eacute;dent',
+                next: 'Suivant',
+                last: 'Dernier'
+            },
+            aria: {
+                sortAscending: ': activer pour trier la colonne par ordre croissant',
+                sortDescending: ': activer pour trier la colonne par ordre décroissant'
+            }
+        },
+        select: true
+    });
+
+</script>
+{% endblock additionalthemescripts %}

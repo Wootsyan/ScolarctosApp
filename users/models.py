@@ -42,6 +42,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _("user")
         verbose_name_plural = _("users")
+        permissions = [
+            ("add_admins", "Can add admins"),
+            ("change_admins", "Can change admins"),
+            ("delete_admins", "Can delete admins"),
+            ("view_admins", "Can view admins"),
+            ("add_organizers", "Can add organizers"),
+            ("change_organizers", "Can change organizers"),
+            ("delete_organizers", "Can delete organizers"),
+            ("view_organizers", "Can view organizers"),
+        ]
 
 class CustomGroup():
     names = [

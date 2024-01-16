@@ -11,6 +11,23 @@
             <nav>
                 <ul class="metismenu" id="menu">
                     <li class="{% if request.resolver_match.url_name == "index" %}active{% endif %}"><a href="{% url "dashboard:index" %}"><i class="ti-dashboard"></i> <span>panel</span></a></li>
+                    {% if perms.users.view_admins or perms.users.view_organizers or perms.users.view_customuser %}
+                    <li>
+                        <a href="javascript:void(0)" aria-expanded="true"><i class="ti-user"></i><span>Użytkownicy</span></a>
+                        <ul class="collapse">
+                            {% if perms.users.view_admins %}
+                            <li class="{% if request.resolver_match.url_name == "users-list-admins" %}active{% endif %}"><a href="{% url "dashboard:users-list-admins" %}">Administratorzy</a></li>
+                            {% endif %}
+                            {% if perms.users.view_organizers %}
+                            <li class="{% if request.resolver_match.url_name == "users-list-organizers" %}active{% endif %}"><a href="{% url "dashboard:users-list-organizers" %}">Organizatorzy</a></li>
+                            {% endif %}                            
+                            {% if perms.users.view_customuser %}
+                            <li class="{% if request.resolver_match.url_name == "users-list-students" %}active{% endif %}"><a href="{% url "dashboard:users-list-students" %}">Uczniowe</a></li>                            
+                            <li class="{% if request.resolver_match.url_name == "users-list-guardians" %}active{% endif %}"><a href="{% url "dashboard:users-list-guardians" %}">Opiekunowie</a></li>                            
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
                     <li>
                         <a href="javascript:void(0)" aria-expanded="true"><i class="ti-pie-chart"></i><span>Charts</span></a>
                         <ul class="collapse">

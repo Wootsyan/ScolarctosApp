@@ -22,3 +22,5 @@ urlpatterns = [
     path('auth/', include('authentication.urls')),
     path('dashboard/', include('dashboard.urls')),
 ]
+
+handler403 = 'dashboard.views.error_403'

@@ -111,6 +111,14 @@
             responsive: true
         });
     }
+    if ($('#dataTableUsers').length) {
+        $('#dataTableUsers').DataTable({
+            responsive: true,
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pl.json',
+            },
+        });
+    }
 
 
     /*================================
