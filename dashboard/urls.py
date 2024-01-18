@@ -12,4 +12,7 @@ urlpatterns = [
     path('users/organizers/new/', views.CreateUserOrganizerView.as_view(), name='users-organizers-new'),
     path('users/students/', views.UserStudentsListView.as_view(), name='users-list-students'),
     path('users/guardians/', views.UserGuardiansListView.as_view(), name='users-list-guardians'),
+    path('users/<int:pk>/', views.UserDetailView.as_view(), name='users-detail'),
+    path('users/<int:pk>/edit/', views.UserUpdateView.as_view(), name='users-edit'),
+    path('users/<int:pk>/delete/', views.UserDeleteView.as_view(), name='users-delete'),
 ]

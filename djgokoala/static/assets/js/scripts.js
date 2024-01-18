@@ -117,6 +117,12 @@
             language: {
                 url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pl.json',
             },
+            columnDefs: [
+                {
+                    targets: [-1],
+                    orderable: false,
+                },
+            ],
         });
     }
 
@@ -236,5 +242,12 @@
             $('body').removeClass('expanded');
         });
     }
+
+    /*================================
+    Others
+    ==================================*/
+    $(document).on('click', '.confirm-delete', function(){
+        return confirm('Czy na pewno chcesz usunąć?');
+    })
 
 })(jQuery);

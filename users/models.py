@@ -24,11 +24,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_("email address"), unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=9, validators=[MinLengthValidator], unique=True, null=True, default=None)
+    phone_number = models.CharField(max_length=9, validators=[MinLengthValidator(9)], unique=True, null=True, default=None, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     data_joined = models.DateTimeField(default=timezone.now)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, default=STUDENT)
 
     USERNAME_FIELD = "email"

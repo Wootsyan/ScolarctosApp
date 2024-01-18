@@ -1,0 +1,53 @@
+{% extends "dashboard/base.html" %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+{% if page_type == 'admins' %}
+<li><a href="{% url "dashboard:users-list-admins" %}">Administratorzy</a></li>
+{% elif page_type == 'organizers' %}
+<li><a href="{% url "dashboard:users-list-organizers" %}">Organizatorzy</a></li>
+{% endif %}
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+<div class="main-content-inner">
+    <div class="row justify-content-md-center">
+        <div class="col-lg-8 col-ml-10 col-sm-12">
+            <div class="row">
+                <!-- Textual inputs start -->
+                <div class="col-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title">Nowy użytkownik</h4>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.first_name.id_for_label }}" class="col-form-label">Imię</label>
+                                        {{ form.first_name }}
+                                        <div class="text-danger">{{ form.first_name.errors }}</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.last_name.id_for_label }}" class="col-form-label">Nazwisko</label>
+                                        {{ form.last_name }}
+                                        <div class="text-danger">{{ form.last_name.errors }}</div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.email.id_for_label }}" class="col-form-label">Adres e-mail</label>
+                                        {{ form.email }}
+                                        <div class="text-danger">{{ form.email.errors }}</div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-4 pr-4 pl-4">Utwórz</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- Textual inputs end -->
+            </div>
+        </div>
+    </div>
+</div>    
+{% endblock content %}
