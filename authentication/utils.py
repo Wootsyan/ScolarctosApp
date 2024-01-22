@@ -1,8 +1,8 @@
 from django.conf import settings
-import jwt
-import datetime
+import jwt, datetime, string
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
+from django.utils.crypto import get_random_string
 from django.template.loader import render_to_string
 from django.urls import reverse
 
@@ -26,6 +26,13 @@ def check_token(token):
     except:
         return False
     
+def generate_confirmation_code(length=6, allowed_chars=string.digits):
+    if length <= 0 or allowed_chars == '':
+        return ''
+    
+    return get_random_string(length=length, allowed_chars=allowed_chars)
+
+
 def send_verification_mail(to_user):
     exp_minutes = 30
     email_verify_token = generate_token(to_user.id, to_user.email, exp_minutes=exp_minutes)
@@ -50,6 +57,7 @@ def send_verification_mail(to_user):
     except:
         return False
     
+
 def send_reset_password_mail(to_user):
     exp_minutes = 15
     email_verify_token = generate_token(to_user.id, to_user.email, exp_minutes=exp_minutes)
@@ -73,3 +81,25 @@ def send_reset_password_mail(to_user):
         return True
     except:
         return False
+    
+def send_confirmation_code_mail(to_user, confirmation_code):
+    email_data = {
+        'user_name': to_user.first_name,
+        'confirmation_code': confirmation_code,
+    } 
+
+    html_message = render_to_string(template_name="auth/email/email-confirmation-code.html", context=email_data)
+    plain_message = strip_tags(html_message)
+    try:
+        mail = EmailMultiAlternatives(
+            subject="Potwierdź dostęp do adresu e-mail - Zespół Koala",
+            body=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[to_user.email],
+        )
+        mail.attach_alternative(html_message, "text/html")
+        mail.send()
+        return True
+    except:
+        return False
+    

@@ -1,0 +1,45 @@
+{% extends "dashboard/base.html" %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+<div class="main-content-inner">
+    <div class="row justify-content-md-center">
+        <div class="col-lg-6 col-ml-8 col-sm-12">
+            <div class="row">
+                <div class="mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title text-center">Jesteś pewien?</h4>
+                            <h4 class="header-title text-center">{{ confirmation_code }}</h4>
+                            <p class="text-center">Czy chcesz usunąć swoje konto {{ user.email }}?<br />Obiekty zależne od Twojego konta również zostaną usunięte.</p>
+                            <p class="text-center">Wysłaliśmy na Twojego maila jednorazowy kod w celu potwierdzenia.<br />Wklej go poniżej. Pamiętaj by nie zamykać karty przeglądarki.</p>
+                            <div class="mt-3 text-center">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="{{ form.confirm_code.id_for_label }}" class="col-form-label">Kod potwierdzający</label>
+                                            {{ form.confirm_code }}
+                                            <div class="text-danger">{{ form.confirm_code.errors }}</div>
+                                            {% if messages %}
+                                            <div class="text-danger">
+                                                {% for message in messages  %}
+                                                    {{ message }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                    </div>
+                                    <button type="submit" class="btn btn-danger mt-4 pr-4 pl-4">Tak, na pewno</button>
+                                    <a href="{% url "dashboard:profile-detail" %}" class="btn btn-warning mt-4 pr-4 pl-4" role="button" aria-pressed="true">Powrót</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    
+{% endblock content %}

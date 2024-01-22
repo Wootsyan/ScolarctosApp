@@ -1,8 +1,10 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
+from django.core.validators import MinLengthValidator, MaxLengthValidator
+from django.core.exceptions import ValidationError
 from users.forms import CustomUserCreationForm
 from users.models import CustomUser
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.forms import SetPasswordForm
+
 
 class RegisterForm(CustomUserCreationForm):
     SELECTED_USER_TYPE_CHOICES = (
@@ -28,3 +30,10 @@ class LoginForm(forms.Form):
         model = CustomUser
         fields = ('email', 'password',)
     
+class ConfirmationForm(forms.Form):
+    def OnlyIntValidator(value): 
+        if value.isdigit() == False:
+            raise ValidationError('Upewnij się, że ta wartość zawiera tylko cyfry.')
+        
+    confirm_code = forms.CharField(label="Confirmation Code", validators=[MinLengthValidator(6), MaxLengthValidator(6), OnlyIntValidator])
+    confirm_code.widget.attrs.update({'class': 'form-control text-center'})

@@ -2,33 +2,24 @@
 {% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
 {% block page_title %}{{ page_name }}{% endblock page_title %}
 {% block breadcrumb %}
-{% if user.user_type == user.STUDENT %}
-<li><a href="{% url "dashboard:users-list-students" %}">Uczniowie</a></li>
-{% elif user.user_type == user.GUARDIAN %}
-<li><a href="{% url "dashboard:users-list-guardians" %}">Opiekunowe</a></li>
-{% elif user.user_type == user.ORGANIZER %}
-<li><a href="{% url "dashboard:users-list-organizers" %}">Organizatorzy</a></li>
-{% elif user.user_type == user.ADMIN %}
-<li><a href="{% url "dashboard:users-list-admins" %}">Administratorzy</a></li>
-{% endif %}
 <li><span>{{ page_name }}</span></li>
 {% endblock breadcrumb %}
 {% block content %}
 <div class="main-content-inner">
     <div class="row justify-content-md-center">
-        <div class="col-lg-10 col-ml-10 col-sm-12">
+        <div class="col-lg-8 col-ml-10 col-sm-12">
             <div class="row">
                 <div class="col-lg-6 col-md-12 mt-5">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="header-title text-center">Szczegóły użytkownika</h4>
+                            <h4 class="header-title text-center">Twój profil</h4>
                             <div class="single-table">
                                 <div class="table-responsive">
                                     <table class="table table-hover text-center">
                                         <tbody>
                                             <tr>
                                                 <th scope="row">Adres e-mail:</th>
-                                                <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+                                                <td>{{ user.email }}</td>
                                             </tr>
                                             <tr>
                                                 <th scope="row">Imię:</th>
@@ -40,7 +31,7 @@
                                             </tr>
                                             <tr>
                                                 <th scope="row">Numer telefonu:</th>
-                                                <td>{% if user.phone_number %}<a href="tel:{{ user.phone_number }}">{{ user.phone_number }}</a>{% else %}Brak{% endif %}</td>
+                                                <td>{% if user.phone_number %}{{ user.phone_number }}{% else %}Brak{% endif %}</td>
                                             </tr>
                                             <tr>
                                                 <th scope="row">Konto aktywowane:</th>
@@ -59,16 +50,12 @@
                                 </div>
                             </div>
                             <div class="mt-5 text-center">
-                                {% if user.user_type == user.ADMIN and perms.users.change_admins or user.user_type == user.ORGANIZER and perms.users.change_organizers or user.user_type == user.STUDENT and perms.users.change_customuser or user.user_type == user.GUARDIAN and perms.users.change_customuser %}
-                                <a href="{% url "dashboard:users-edit" user.id %}" class="btn btn-primary" role="button" aria-pressed="true">
+                                <a href="{% url "dashboard:profile-edit" %}" class="btn btn-primary" role="button" aria-pressed="true">
                                     <i class="ti-pencil-alt"></i>
                                 </a>
-                                {% endif %}
-                                {% if user.user_type == user.ADMIN and perms.users.delete_admins or user.user_type == user.ORGANIZER and perms.users.delete_organizers or user.user_type == user.STUDENT and perms.users.delete_customuser or user.user_type == user.GUARDIAN and perms.users.delete_customuser %}
-                                <a href="{% url "dashboard:users-delete" user.id %}" class="btn btn-danger" role="button" aria-pressed="true">
+                                <a href="{% url "dashboard:profile-delete" %}" class="btn btn-danger" role="button" aria-pressed="true">
                                     <i class="ti-trash"></i>
                                 </a>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -76,7 +63,7 @@
                 <div class="col-lg-6 col-md-12 mt-5">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="header-title text-center">Opis</h4>
+                            <h4 class="header-title text-center">Twój opis</h4>
                             <p>{% if user.description %}{{ user.description }}{% else %}Opis nie został uzupełniony{% endif %}</p>
                         </div>
                     </div>

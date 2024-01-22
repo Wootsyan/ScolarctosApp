@@ -60,7 +60,7 @@
                         <div class="user-thumb"><i class="ti-user"></i></div>
                         <h4 class="user-name dropdown-toggle" data-toggle="dropdown">{{ request.user.first_name }} {{ request.user.last_name }} <i class="fa fa-angle-down"></i></h4>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Ustawienia profilu</a>
+                            <a class="dropdown-item" href="{% url "dashboard:profile-detail" %}">Profil</a>
                             <a class="dropdown-item" href="#">Wiadomości</a>
                             <a class="dropdown-item" href="{% url "logout" %}">Wyloguj się</a>
                         </div>

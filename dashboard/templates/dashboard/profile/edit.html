@@ -1,0 +1,69 @@
+{% extends "dashboard/base.html" %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+<div class="main-content-inner">
+    <div class="row justify-content-md-center">
+        <div class="col-lg-8 col-ml-10 col-sm-12">
+            <div class="row">
+                <!-- Textual inputs start -->
+                <div class="col-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title">Edytuj profil</h4>
+                            <div class="row">
+                                <div class="col-lg-6 col-sm-12">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <fieldset disabled>
+                                        <div class="form-group">
+                                            <label>Adres e-mail</label>
+                                            <input type="text" class="form-control" value="{{ user.email }}">
+                                            <div class="text-primary"><a href="#">Kliknij tutaj jeśli chcesz zmienić swój adres e-mail</a></div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Hasło</label>
+                                            <input type="password" class="form-control" value="password">
+                                            <div class="text-primary"><a href="#">Kliknij tutaj jeśli chcesz zmienić hasło</a></div>
+                                        </div>
+                                        </fieldset>
+                                        <div class="form-group">
+                                            <label for="{{ form.first_name.id_for_label }}" class="col-form-label">Imię</label>
+                                            {{ form.first_name }}
+                                            <div class="text-danger">{{ form.first_name.errors }}</div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="{{ form.last_name.id_for_label }}" class="col-form-label">Nazwisko</label>
+                                            {{ form.last_name }}
+                                            <div class="text-danger">{{ form.last_name.errors }}</div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="{{ form.phone_number.id_for_label }}" class="col-form-label">Numer telefonu</label>
+                                            {{ form.phone_number }}
+                                            <div class="text-danger">{{ form.phone_number.errors }}</div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="{{ form.description.id_for_label }}" class="col-form-label">Opis</label>
+                                            {{ form.description }}
+                                            <div class="text-danger">{{ form.description.errors }}</div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mt-4 pr-4 pl-4" name="_save">Zapisz</button>
+                                        <button type="submit" class="btn btn-primary mt-4 pr-4 pl-4 opacity-75" name="_continue">Zapisz i kontynuuj edycję</button>
+                                        <a href="{% url "dashboard:profile-detail" %}" class="btn btn-warning mt-4 pr-4 pl-4" role="button" aria-pressed="true">Powrót</a>
+                                    </form>
+                                </div>
+                                <div class="col-lg-6 col-sm-12">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Textual inputs end -->
+            </div>
+        </div>
+    </div>
+</div>    
+{% endblock content %}

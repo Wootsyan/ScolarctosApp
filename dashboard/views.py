@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
@@ -10,12 +12,16 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import Group
 from users.models import CustomUser, CustomGroup
 from users.forms import SpecialUserCreateForm
-from authentication.utils import send_verification_mail
+from authentication.forms import ConfirmationForm
+from authentication.utils import send_verification_mail, send_confirmation_code_mail, generate_confirmation_code
 
 @method_decorator(login_required, name='dispatch')
 class IndexView(TemplateView):
         template_name = "dashboard/index.html"
 
+'''
+### Users
+'''
 @method_decorator(login_required, name='dispatch')
 class UserAdminsListView(PermissionRequiredMixin, ListView):
     model = CustomUser
@@ -26,7 +32,6 @@ class UserAdminsListView(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(UserAdminsListView, self).get_context_data(**kwargs)
         context['page_name'] = 'Administratorzy'
-        context['page_type'] = 'admins'
         return context
     
     def get_queryset(self):
@@ -51,7 +56,6 @@ class CreateUserAdminView(PermissionRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(CreateUserAdminView, self).get_context_data(**kwargs)
         context['page_name'] = 'Nowy administrator'
-        context['page_type'] = 'admins'
         return context
 
 
@@ -65,7 +69,6 @@ class UserOrganizersListView(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(UserOrganizersListView, self).get_context_data(**kwargs)
         context['page_name'] = 'Organizatorzy'
-        context['page_type'] = 'organizers'
         return context
     
     def get_queryset(self):
@@ -90,7 +93,6 @@ class CreateUserOrganizerView(PermissionRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(CreateUserOrganizerView, self).get_context_data(**kwargs)
         context['page_name'] = 'Nowy organizator'
-        context['page_type'] = 'organizers'
         return context
 
 @method_decorator(login_required, name='dispatch')
@@ -103,12 +105,10 @@ class UserStudentsListView(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(UserStudentsListView, self).get_context_data(**kwargs)
         context['page_name'] = 'Uczniowie'
-        context['page_type'] = 'students'
         return context
     
     def get_queryset(self):
         return CustomUser.objects.filter(user_type=CustomUser.STUDENT).exclude(id=self.request.user.id)
-
 
 @method_decorator(login_required, name='dispatch')
 class UserGuardiansListView(PermissionRequiredMixin, ListView):
@@ -120,7 +120,6 @@ class UserGuardiansListView(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(UserGuardiansListView, self).get_context_data(**kwargs)
         context['page_name'] = 'Opiekunowie'
-        context['page_type'] = 'guardians'
         return context
     
     def get_queryset(self):
@@ -215,5 +214,106 @@ class UserDeleteView(PermissionRequiredMixin, DeleteView):
         elif context_user_object.user_type == CustomUser.GUARDIAN:
             return reverse_lazy('dashboard:users-list-guardians')
     
+
+'''
+### Profile
+'''
+@method_decorator(login_required, name='dispatch')
+class ProfileDetailView(PermissionRequiredMixin, DetailView):
+    model = CustomUser
+    context_object_name = 'user'
+    template_name = 'dashboard/profile/detail.html'
+
+    def get_object(self):
+        return self.model.objects.get(pk=self.request.user.id)
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileDetailView, self).get_context_data(**kwargs)
+        context['page_name'] = f"Profil: {context['user'].first_name} {context['user'].last_name}"
+        context['user'].user_type_name = context['user'].USER_TYPE_CHOICES[context['user'].user_type - 1][1]
+        return context
+    
+    def has_permission(self):
+        context_user_object = self.get_object()
+        if context_user_object.id == self.request.user.id:
+            return True
+        
+@method_decorator(login_required, name='dispatch')
+class ProfileUpdateView(PermissionRequiredMixin, UpdateView):
+    model = CustomUser
+    context_object_name = 'user'
+    template_name = 'dashboard/profile/edit.html'
+
+    fields = [ 
+        'first_name', 
+        'last_name',
+        'phone_number',
+        'description',
+    ]
+
+    def get_object(self):
+        return self.model.objects.get(pk=self.request.user.id)
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileUpdateView, self).get_context_data(**kwargs)
+        context['page_name'] = "Edytuj swój profil"
+        for field in self.fields:
+            context['form'].fields[field].widget.attrs['class'] = 'form-control'
+        return context
+    
+    def has_permission(self):
+        context_user_object = self.get_object()
+        if context_user_object.id == self.request.user.id:
+            return True
+    
+    def get_success_url(self) -> str:
+        if '_save' in self.request.POST:
+            return reverse_lazy('dashboard:profile-detail')
+        elif '_continue' in self.request.POST:
+            return reverse_lazy('dashboard:profile-edit')
+
+@method_decorator(login_required, name='dispatch')
+class ProfileDeleteView(PermissionRequiredMixin, DeleteView):
+    model = CustomUser
+    context_object_name = 'user'
+    template_name = 'dashboard/profile/delete.html'
+    form_class = ConfirmationForm
+    confirmation_code = generate_confirmation_code()
+
+    def get_object(self):
+        return self.model.objects.get(pk=self.request.user.id)
+    
+    def dispatch(self, request, *args, **kwargs):
+        messages_storage = messages.get_messages(self.request)
+        if request.method == 'GET' and not messages_storage:
+            send_confirmation_code_mail(to_user=self.request.user, confirmation_code=self.confirmation_code)
+        return super(ProfileDeleteView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileDeleteView, self).get_context_data(**kwargs)
+        context['page_name'] = "Usuwanie konta"
+        return context
+    
+    def has_permission(self):
+        context_user_object = self.get_object()
+        if context_user_object.id == self.request.user.id:
+            return True
+    
+    def get_success_url(self) -> str:
+        return reverse_lazy('logout')
+    
+    def form_valid(self, form):
+        form_confirm_code = form.cleaned_data['confirm_code']
+        if self.confirmation_code == form_confirm_code:
+            success_url = self.get_success_url()
+            self.object.delete()
+            return HttpResponseRedirect(success_url)
+        else:
+            messages.add_message(self.request, messages.ERROR, f'Kod potwierdzający: {form_confirm_code} jest nieprawidłowy')
+            return HttpResponseRedirect(reverse_lazy('dashboard:profile-delete'))
+        
+'''
+### Others
+'''
 def error_403(request, exception):
     return render(request, 'dashboard/errors/403.html')
