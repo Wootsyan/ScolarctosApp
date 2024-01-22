@@ -23,4 +23,4 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
 ]
 
-handler403 = 'dashboard.views.error_403'
+handler403 = 'dashboard.views.main.error_403'
