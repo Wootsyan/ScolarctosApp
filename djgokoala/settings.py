@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'users',
     'authentication',
     'dashboard',
+    'files',
 ]
 
 MIDDLEWARE = [
@@ -135,8 +136,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_DOCUMENTS_DIR = STATIC_URL + 'documents/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'djgokoala/static/'
+    BASE_DIR / 'djgokoala/static/',
+    BASE_DIR / 'static/',
 ]
 
 # Default primary key field type
