@@ -1,0 +1,78 @@
+{% extends "dashboard/base.html" %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+<li><a href="{% url "dashboard:schools-list" %}">Szkoły</a></li>
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+<div class="main-content-inner">
+    <div class="row justify-content-md-center">
+        <div class="col-lg-10 col-ml-10 col-sm-12">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title text-center">Szczegóły szkoły</h4>
+                            <div class="single-table">
+                                <div class="table-responsive">
+                                    <table class="table table-hover text-center">
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Nazwa:</th>
+                                                <td>{{ school.name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Ulica:</th>
+                                                <td>{{ school.street }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Kod pocztowy:</th>
+                                                <td>{{ school.postcode }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Miasto:</th>
+                                                <td>{{ school.city }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Typ szkoły:</th>
+                                                <td>{% if school.school_type == 1 %}Podstawowa{% elif school.school_type == 2 %}Ponadpodstawowa{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Data dodania:</th>
+                                                <td>{{ school.added_date|date:"Y-m-d" }}</td>
+                                            </tr>                                           
+                                            <tr>
+                                                <th scope="row">Zatwierdzona:</th>
+                                                <td>{% if school.accepted %}Tak{% else %}Nie{% endif %}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Dodano przez:</th>
+                                                <td>{{ school.added_by.first_name }} {{ school.added_by.last_name }}<br />{{ school.added_by.email }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="mt-5 text-center">
+                                {% if perms.dashboard.change_school or school.added_by == user %}
+                                <a href="{% url "dashboard:schools-edit" school.id %}" class="btn btn-primary" role="button" aria-pressed="true">
+                                    <i class="ti-pencil-alt"></i>
+                                </a>
+                                {% endif %}
+                                {% if perms.dashboard.delete_school %}
+                                <a href="#{% comment "" %}{% url "dashboard:users-delete" user.id %}{% endcomment %}" class="btn btn-danger" role="button" aria-pressed="true">
+                                    <i class="ti-trash"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 mt-5">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    
+{% endblock content %}

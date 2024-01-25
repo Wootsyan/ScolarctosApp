@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinLengthValidator
+from django.core.validators import MinLengthValidator, RegexValidator
 from django.utils import timezone
 from users.models import CustomUser as User
 
@@ -14,7 +14,10 @@ class School(models.Model):
 
     name = models.CharField(max_length=63, unique=True)
     street = models.CharField(max_length=63)
-    postcode = models.CharField(max_length=6, validators=[MinLengthValidator(6)])
+    postcode = models.CharField(max_length=6, validators=[MinLengthValidator(6), RegexValidator(
+                regex=r'^\d{2}-\d{3}$',
+                message="Wprowadź prawidłowy kod pocztowy w formacie 12-345",
+            ),])
     city = models.CharField(max_length=63)
     school_type = models.PositiveSmallIntegerField(choices=SCHOOL_TYPE_CHOICES, default=FIRST_LEVEL)
     accepted = models.BooleanField(default=False)

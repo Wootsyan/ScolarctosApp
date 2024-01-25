@@ -2,10 +2,10 @@
 {% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
 {% block page_title %}{{ page_name }}{% endblock page_title %}
 {% block breadcrumb %}
-{% if page_type == 'admins' %}
-<li><a href="{% url "dashboard:users-list-admins" %}">Administratorzy</a></li>
-{% elif page_type == 'organizers' %}
+{% if user.user_type == user.ORGANIZER %}
 <li><a href="{% url "dashboard:users-list-organizers" %}">Organizatorzy</a></li>
+{% elif user.user_type == user.ADMIN %}
+<li><a href="{% url "dashboard:users-list-admins" %}">Administratorzy</a></li>
 {% endif %}
 <li><span>{{ page_name }}</span></li>
 {% endblock breadcrumb %}

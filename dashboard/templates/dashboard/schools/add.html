@@ -1,0 +1,61 @@
+{% extends "dashboard/base.html" %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+<li><a href="{% url "dashboard:schools-list" %}">Szkoły</a></li>
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+<div class="main-content-inner">
+    <div class="row justify-content-md-center">
+        <div class="col-lg-8 col-ml-10 col-sm-12">
+            <div class="row">
+                <!-- Textual inputs start -->
+                <div class="col-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title">Nowa szkoła</h4>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="{{ form.name.id_for_label }}" class="col-form-label">Nazwa szkoły</label>
+                                        {{ form.name }}
+                                        <div class="text-danger">{{ form.name.errors }}</div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.street.id_for_label }}" class="col-form-label">Ulica (bez ul.)</label>
+                                        {{ form.street }}
+                                        <div class="text-danger">{{ form.street.errors }}</div>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label for="{{ form.postcode.id_for_label }}" class="col-form-label">Kod pocztowy</label>
+                                        {{ form.postcode }}
+                                        <div class="text-danger">{{ form.postcode.errors }}</div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.city.id_for_label }}" class="col-form-label">Miasto</label>
+                                        {{ form.city }}
+                                        <div class="text-danger">{{ form.city.errors }}</div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.school_type.id_for_label }}" class="col-form-label">Typ szkoły</label>
+                                        {{ form.school_type }}
+                                        <div class="text-danger">{{ form.school_type.errors }}</div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-4 pr-4 pl-4">Utwórz</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- Textual inputs end -->
+            </div>
+        </div>
+    </div>
+</div>    
+{% endblock content %}

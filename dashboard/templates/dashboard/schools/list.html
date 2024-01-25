@@ -1,8 +1,7 @@
 {% extends "dashboard/base.html" %}
-{% block meta_title %}Lista {{ page_name }} | Koala{% endblock meta_title %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
 {% block page_title %}{{ page_name }}{% endblock page_title %}
 {% block breadcrumb %}
-<li><a>Użytkownicy</a></li>
 <li><span>{{ page_name }}</span></li>
 {% endblock breadcrumb %}
 {% block content %}
@@ -14,54 +13,57 @@
                         <div class="card-body">
                             <div class="row mb-3">
                                 <div class="col-lg-6">
-                                    <h4 class="header-title">Lista użytkowników</h4>
+                                    <h4 class="header-title">Lista szkół</h4>
                                 </div>
                                 <div class="col-lg-6 d-flex justify-content-lg-end">
-                                    {% if user.user_type == user.ADMIN and perms.users.add_admins %}
-                                    <a href="{% url "dashboard:users-admins-new" %}" class="btn btn-primary" role="button" aria-pressed="true">Utwórz nowe konto</a>
-                                    {% elif user.user_type == user.ORGANIZER and perms.users.add_organizers %}
-                                    <a href="{% url "dashboard:users-organizers-new" %}" class="btn btn-primary" role="button" aria-pressed="true">Utwórz nowe konto</a>
+                                    {% if perms.dashboard.add_school %}
+                                    <a href="{% url "dashboard:schools-new" %}" class="btn btn-primary" role="button" aria-pressed="true">Dodaj nową szkołę</a>
                                     {% endif %}
                                 </div>
                             </div>
-                            {% if users_list %}
+                            {% if schools %}
                             <div class="data-tables datatable-dark">
-                                <table id="dataTableUsers" class="text-center">
+                                <table id="dataTableSchools" class="text-center">
                                     <thead class="">
                                         <tr>
-                                            <th class="desktop">Adres e-mail</th>
-                                            <th class="desktop">Imię</th>
-                                            <th class="desktop">Nazwisko</th>
-                                            <th class="desktop">Numer telefonu</th>
-                                            <th class="desktop">Data dołączenia</th>
+                                            <th class="desktop">Nazwa szkoły</th>
+                                            <th class="desktop">Ulica</th>
+                                            <th class="desktop">Kod pocztowy</th>
+                                            <th class="desktop">Miasto</th>
+                                            <th class="desktop">Typ szkoły</th>
+                                            <th class="desktop">Data dodania</th>
+                                            <th class="desktop">Zatwierdzona</th>
                                             <th class="desktop">Akcja</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for user in users_list %}
+                                        {% for school in schools %}
                                         <tr>
-                                            <td>{{ user.email }}</td>
-                                            <td>{{ user.first_name }}</td>
-                                            <td>{{ user.last_name }}</td>                                            
-                                            <td>{{ user.phone_number|default_if_none:"Brak" }}</td>
-                                            <td>{{ user.data_joined|date:"Y-m-d" }}</td>
+                                            <td>{{ school.name }}</td>
+                                            <td>{{ school.street }}</td>
+                                            <td>{{ school.postcode }}</td>                                            
+                                            <td>{{ school.city }}</td>
+                                            <td>{% if school.school_type == 1 %}Podstawowa{% elif school.school_type == 2 %}Ponadpodstawowa{% endif %}</td>
+                                            <td>{{ school.added_date|date:"Y-m-d" }}</td>
+                                            <td>{% if school.accepted %}Tak{% else %}Nie{% endif %}</td>
                                             <td>
                                                 <div>
-                                                    {% if user.user_type == user.ADMIN and perms.users.view_admins or user.user_type == user.ORGANIZER and perms.users.view_organizers or user.user_type == user.STUDENT and perms.users.view_customuser or user.user_type == user.GUARDIAN and perms.users.view_customuser %}
-                                                    <a href="{% url "dashboard:users-detail" user.id %}" class="btn btn-info" role="button" aria-pressed="true">
+                                                    {% if perms.dashboard.view_school %}
+                                                    <a href="{% url "dashboard:schools-detail" school.id %}" class="btn btn-info" role="button" aria-pressed="true">
                                                         <i class="ti-info"></i>
                                                     </a>
                                                     {% endif %}
-                                                    {% if user.user_type == user.ADMIN and perms.users.change_admins or user.user_type == user.ORGANIZER and perms.users.change_organizers or user.user_type == user.STUDENT and perms.users.change_customuser or user.user_type == user.GUARDIAN and perms.users.change_customuser %}
-                                                    <a href="{% url "dashboard:users-edit" user.id %}" class="btn btn-primary" role="button" aria-pressed="true">
+                                                     {% if perms.dashboard.change_school or school.added_by == user %}
+                                                    <a href="{% url "dashboard:schools-edit" school.id %}" class="btn btn-primary" role="button" aria-pressed="true">
                                                         <i class="ti-pencil-alt"></i>
                                                     </a>
                                                     {% endif %}
+                                                    {% comment %}
                                                     {% if user.user_type == user.ADMIN and perms.users.delete_admins or user.user_type == user.ORGANIZER and perms.users.delete_organizers or user.user_type == user.STUDENT and perms.users.delete_customuser or user.user_type == user.GUARDIAN and perms.users.delete_customuser %}
                                                     <a href="{% url "dashboard:users-delete" user.id %}" class="btn btn-danger" role="button" aria-pressed="true">
                                                         <i class="ti-trash"></i>
                                                     </a>
-                                                    {% endif %}                                                
+                                                    {% endif %} {% endcomment %}
                                                 </div>
                                             </td>
                                         </tr>
@@ -70,7 +72,7 @@
                                 </table>
                             </div>
                             {% else %} 
-                            <p class="text-danger">Lista użytkowników jest pusta</p>
+                            <p class="text-danger">Lista szkół jest pusta</p>
                             {% endif %}
                         </div>
                     </div>
