@@ -136,6 +136,10 @@
                     targets: [-1],
                     orderable: false,
                 },
+                {
+                    width: "15%",
+                    targets: 0
+                }
             ],
         });
     }

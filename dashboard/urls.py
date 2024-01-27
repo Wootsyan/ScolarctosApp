@@ -23,5 +23,5 @@ urlpatterns = [
     path('schools/new/', schools.SchoolsCreateView.as_view(), name='schools-new'),
     path('schools/<int:pk>/', schools.SchoolsDetailView.as_view(), name='schools-detail'),
     path('schools/<int:pk>/edit/', schools.SchoolsUpdateView.as_view(), name='schools-edit'),
-    # path('schools/<int:pk>/delete/', schools.UserDeleteView.as_view(), name='schools-delete'),
+    path('schools/<int:pk>/delete/', schools.SchoolsDeleteView.as_view(), name='schools-delete'),
 ]

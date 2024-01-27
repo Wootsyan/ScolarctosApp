@@ -55,16 +55,19 @@
                                 </div>
                             </div>
                             <div class="mt-5 text-center">
-                                {% if perms.dashboard.change_school or school.added_by == user %}
+                                {% if perms.dashboard.change_school or school.added_by == user and not school.accepted %}
                                 <a href="{% url "dashboard:schools-edit" school.id %}" class="btn btn-primary" role="button" aria-pressed="true">
                                     <i class="ti-pencil-alt"></i>
                                 </a>
                                 {% endif %}
                                 {% if perms.dashboard.delete_school %}
-                                <a href="#{% comment "" %}{% url "dashboard:users-delete" user.id %}{% endcomment %}" class="btn btn-danger" role="button" aria-pressed="true">
+                                <a href="{% url "dashboard:schools-delete" school.id %}" class="btn btn-danger" role="button" aria-pressed="true">
                                     <i class="ti-trash"></i>
                                 </a>
                                 {% endif %}
+                                <a href="{% url "dashboard:schools-list" %}" class="btn btn-warning" role="button" aria-pressed="true">
+                                    <i class="ti-back-left"></i>
+                                </a>
                             </div>
                         </div>
                     </div>

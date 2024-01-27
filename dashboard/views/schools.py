@@ -1,5 +1,5 @@
 from django.urls import reverse_lazy
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -79,20 +79,20 @@ class SchoolsCreateView(PermissionRequiredMixin, CreateView):
         return context
     
     def form_valid(self, form):
-        school = form.save()
-        school.added_by = self.request.user
+        self.object = form.save()
+        self.object.added_by = self.request.user
         if self.request.user.user_type in (CustomUser.ADMIN, CustomUser.ORGANIZER):
-            school.accepted = True
-        school.save()
-        return super().form_valid(form)
+            self.object.accepted = True
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
     
     def get_success_url(self):
-        context_school = self.get_object()
-        kwargs = {'pk': context_school.id}
+        kwargs = {'pk': self.object.id}
         if '_save' in self.request.POST:
             return reverse_lazy('dashboard:schools-detail', kwargs=kwargs)
         elif '_continue' in self.request.POST:
             return reverse_lazy('dashboard:schools-edit', kwargs=kwargs)
+    
 
 @method_decorator(login_required, name='dispatch')
 class SchoolsUpdateView(PermissionRequiredMixin, UpdateView):
@@ -106,7 +106,6 @@ class SchoolsUpdateView(PermissionRequiredMixin, UpdateView):
         'postcode',
         'city',
         'school_type',
-        'accepted',
     ]
 
     def get_context_data(self, **kwargs):
@@ -124,6 +123,13 @@ class SchoolsUpdateView(PermissionRequiredMixin, UpdateView):
             return True
         else:
             return self.request.user.has_perm('dashboard.change_school')
+    
+    def form_valid(self, form):
+        school = form.save()
+        if self.request.user.user_type in (CustomUser.ADMIN, CustomUser.ORGANIZER):
+            school.accepted = True
+        school.save()
+        return super().form_valid(form)
         
     def get_success_url(self):
         context_school = self.get_object()
@@ -132,3 +138,18 @@ class SchoolsUpdateView(PermissionRequiredMixin, UpdateView):
             return reverse_lazy('dashboard:schools-detail', kwargs=kwargs)
         elif '_continue' in self.request.POST:
             return reverse_lazy('dashboard:schools-edit', kwargs=kwargs)
+
+@method_decorator(login_required, name='dispatch')
+class SchoolsDeleteView(PermissionRequiredMixin, DeleteView):
+    model = School
+    context_object_name = 'school'
+    template_name = 'dashboard/schools/delete.html'
+    permission_required = ('dashboard.delete_school')
+
+    def get_context_data(self, **kwargs):
+        context = super(SchoolsDeleteView, self).get_context_data(**kwargs)
+        context['page_name'] = f"Szkoła: {context['school'].name}"
+        return context
+    
+    def get_success_url(self):
+        return reverse_lazy('dashboard:schools-list')

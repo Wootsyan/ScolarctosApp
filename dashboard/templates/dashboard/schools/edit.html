@@ -16,7 +16,7 @@
                         <div class="card-body">
                             <h4 class="header-title">Edytuj szkołę</h4>
                             <div class="row">
-                                <div class="col-lg-6 col-sm-12">
+                                <div class="col-lg-8 col-sm-12">
                                     <form method="post">
                                         {% csrf_token %}
                                         <div class="form-row">
@@ -49,27 +49,22 @@
                                                 {{ form.school_type }}
                                                 <div class="text-danger">{{ form.school_type.errors }}</div>
                                             </div>
-                                            {% if perms.dashboard.change_school %}
                                             <div class="col-md-6 mb-3">
-                                                <label for="{{ form.accepted.id_for_label }}" class="col-form-label">Zatwierdzona</label>
-                                                {{ form.accepted }}
-                                                <div class="text-danger">{{ form.accepted.errors }}</div>
-                                            </div>
-                                            {% else %}
-                                            <fieldset disabled>
-                                                <div class="col-md-6 mb-3 form-group">
-                                                    <label>Zatwierdzona</label>
-                                                    <input type="text" class="form-control" value="{{ school.accepted }}">
-                                                </div>
+                                                <fieldset disabled>
+                                                    <label class="col-form-label">Zatwierdzona</label>
+                                                    <input type="text" class="form-control" value="{% if school.accepted %}Tak{% else %}Nie{% endif %}">
                                                 </fieldset>
-                                            {% endif %}                                            
+                                            </div>                                                                                
                                         </div>
+                                        {% if perms.dashboard.change_school and not school.accepted %}
+                                        <div class="text-info">Zapisanie informacji o szkole jest równoznaczne z jej zatwierdzeniem.</div>
+                                        {% endif %} 
                                         <button type="submit" class="btn btn-primary mt-4 pr-4 pl-4" name="_save">Zapisz</button>
                                         <button type="submit" class="btn btn-primary mt-4 pr-4 pl-4 opacity-75" name="_continue">Zapisz i kontynuuj edycję</button>
                                         <a href="{% url "dashboard:schools-detail" school.id %}" class="btn btn-warning mt-4 pr-4 pl-4" role="button" aria-pressed="true">Powrót</a>
                                     </form>
                                 </div>
-                                <div class="col-lg-6 col-sm-12">
+                                <div class="col-lg-4 col-sm-12">
                                 </div>
                             </div>
                         </div>

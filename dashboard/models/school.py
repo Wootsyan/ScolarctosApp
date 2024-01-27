@@ -12,7 +12,7 @@ class School(models.Model):
         (SECOND_LEVEL, 'Ponadpodstawowa'),
     )
 
-    name = models.CharField(max_length=63, unique=True)
+    name = models.CharField(max_length=255, unique=True)
     street = models.CharField(max_length=63)
     postcode = models.CharField(max_length=6, validators=[MinLengthValidator(6), RegexValidator(
                 regex=r'^\d{2}-\d{3}$',

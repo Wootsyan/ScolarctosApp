@@ -53,17 +53,16 @@
                                                         <i class="ti-info"></i>
                                                     </a>
                                                     {% endif %}
-                                                     {% if perms.dashboard.change_school or school.added_by == user %}
+                                                     {% if perms.dashboard.change_school or school.added_by == user and not school.accepted %}
                                                     <a href="{% url "dashboard:schools-edit" school.id %}" class="btn btn-primary" role="button" aria-pressed="true">
                                                         <i class="ti-pencil-alt"></i>
                                                     </a>
                                                     {% endif %}
-                                                    {% comment %}
-                                                    {% if user.user_type == user.ADMIN and perms.users.delete_admins or user.user_type == user.ORGANIZER and perms.users.delete_organizers or user.user_type == user.STUDENT and perms.users.delete_customuser or user.user_type == user.GUARDIAN and perms.users.delete_customuser %}
-                                                    <a href="{% url "dashboard:users-delete" user.id %}" class="btn btn-danger" role="button" aria-pressed="true">
+                                                    {% if perms.dashboard.delete_school %}
+                                                    <a href="{% url "dashboard:schools-delete" school.id %}" class="btn btn-danger" role="button" aria-pressed="true">
                                                         <i class="ti-trash"></i>
                                                     </a>
-                                                    {% endif %} {% endcomment %}
+                                                    {% endif %}
                                                 </div>
                                             </td>
                                         </tr>
