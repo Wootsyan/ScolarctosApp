@@ -1,0 +1,153 @@
+{% extends "dashboard/base.html" %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+{% if perms.dashboard.view_team %}<li><a href="{% url "dashboard:teams-list" %}">Zespoły</a></li>{% endif %}
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+<div class="main-content-inner">
+    <div class="row justify-content-md-center">
+        <div class="col-lg-10 col-ml-10 col-sm-12">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title text-center">Szczegóły zespołu</h4>
+                            <div class="single-table">
+                                <div class="table-responsive">
+                                    <table class="table table-hover text-center">
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">Nazwa:</th>
+                                                <td>{{ team.name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Szkoła:</th>
+                                                <td>
+                                                    {% if team.school %}
+                                                    <a href="{% url "dashboard:schools-detail" team.school.id %}" title="{{ team.school.name }}">{{ team.school.name }}</a>
+                                                    {% else %}
+                                                    <span class="text-danger">Brak</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Kapitan:</th>
+                                                <td>
+                                                    {% if team.leader %}
+                                                    <a href="{% if team.leader == user %}{% url "dashboard:profile-detail" %}{% else %}{% url "dashboard:users-detail" team.leader.id %}{% endif %}" title="{{ team.leader.first_name }} {{ team.leader.last_name }}">{{ team.leader.email }}</a>
+                                                    {% else %}
+                                                    <span class="text-danger">Brak</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Opiekun:</th>
+                                                <td>
+                                                    {% if team.team_tutor %}
+                                                    <a href="{% url "dashboard:users-detail" team.team_tutor.tutor %}">{{ team.team_tutor.tutor.email }}</a>
+                                                    {% else %}
+                                                    <span class="text-danger">Brak</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Zatwierdzony:</th>
+                                                <td>
+                                                    {% if not team.editable %}
+                                                    <i title="Tak" class="fa fa-circle text-success"></i>
+                                                    {% else %}
+                                                    <i title="Nie" class="fa fa-circle text-danger"></i>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Data utworzenia</th>
+                                                <td>{{ team.added_date|date:"Y-m-d" }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="mt-5 text-center">
+                                {% if perms.dashboard.change_team or team.leader == user and team.editable %}
+                                <a href="{% url "dashboard:teams-edit" team.id %}" class="btn btn-primary" role="button" aria-pressed="true">
+                                    <i class="ti-pencil-alt"></i>
+                                </a>
+                                {% endif %}
+                                {% if perms.dashboard.delete_team or team.leader == user and team.editable %}
+                                <a href="{% url "dashboard:teams-delete" team.id %}" class="btn btn-danger" role="button" aria-pressed="true">
+                                    <i class="ti-trash"></i>
+                                </a>
+                                {% endif %}
+                                {% if team.leader == user and not team.editable %}
+                                    <div class="text-info">Organizatorzy zablokowali możliwość edycji Twojego zespołu. Skontaktuj się z nimi, jeśli z jakiegoś powodu musisz wprowadzić zmiany w zespole.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 mt-5">
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h4 class="header-title text-center">Członkowie zespołu</h4>
+                            <div class="single-table">
+                                <div class="table-responsive">
+                                    <table class="table text-center">
+                                        <thead class="text-uppercase bg-light">
+                                            <tr>
+                                                <th scope="col">LP</th>
+                                                <th scope="col">Imię i nazwisko</th>
+                                                <th scope="col">Zgoda na udział</th>
+                                                <th scope="col">RODO</th>
+                                                <th scope="col">Akcja</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row">1</th>
+                                                <td>{{ team.leader.first_name }} {{ team.leader.last_name }}</td>
+                                                <td><i class="fa fa-circle text-danger"></i></td>
+                                                <td><i class="fa fa-circle text-success"></i></td>
+                                                <td><i class="ti-trash"></i></td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">2</th>
+                                                <td>Jacek Nowaczewski</td>
+                                                <td><i class="fa fa-circle text-danger"></i></td>
+                                                <td><i class="fa fa-circle text-success"></i></td>
+                                                <td><i class="ti-trash"></i></td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">3</th>
+                                                <td>Wojciech Jackowski</td>
+                                                <td><i class="fa fa-circle text-danger"></i></td>
+                                                <td><i class="fa fa-circle text-danger"></i></td>
+                                                <td><i class="ti-trash"></i></td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">4</th>
+                                                <td>Małgorzata Proska</td>
+                                                <td><i class="fa fa-circle text-success"></i></td>
+                                                <td><i class="fa fa-circle text-success"></i></td>
+                                                <td><i class="ti-trash"></i></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title text-center">Opis</h4>
+                            <p>{% if team.description %}{{ team.description }}{% else %}Opis nie został uzupełniony{% endif %}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    
+{% endblock content %}

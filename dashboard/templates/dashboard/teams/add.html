@@ -1,0 +1,59 @@
+{% extends "dashboard/base.html" %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+<div class="main-content-inner">
+    <div class="row justify-content-md-center">
+        <div class="col-lg-8 col-ml-10 col-sm-12">
+            <div class="row">
+                <!-- Textual inputs start -->
+                <div class="col-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title">Nowy zespół</h4>
+                            <div class="row">
+                                <div class="col-lg-8 col-sm-12">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <div class="form-row">
+                                            <div class="col-md-12 mb-3">
+                                                <label for="{{ form.name.id_for_label }}" class="col-form-label">Nazwa zespołu</label>
+                                                {{ form.name }}
+                                                <div class="text-danger">{{ form.name.errors }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-md-12 mb-3">
+                                                <label for="{{ form.school.id_for_label }}" class="col-form-label">Szkoła</label>
+                                                {{ form.school }}
+                                                <div class="text-danger">{{ form.school.errors }}</div>
+                                                <div class="text-info">W przypadku braku Twojej szkoły na liście, pozostaw pole puste i zgłoś swoją szkolę przez formularz: <a href="{% url "dashboard:schools-new" %}">dodaj swoją szkołę</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-md-12 mb-3">
+                                                <label for="{{ form.description.id_for_label }}" class="col-form-label">Opis</label>
+                                                {{ form.description }}
+                                                <div class="text-danger">{{ form.description.errors }}</div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mt-4 pr-4 pl-4" name="_save">Zapisz</button>
+                                        <button type="submit" class="btn btn-primary mt-4 pr-4 pl-4 opacity-75" name="_continue">Zapisz i kontynuuj edycję</button>
+                                        <a href="#" class="btn btn-warning mt-4 pr-4 pl-4" role="button" aria-pressed="true">Powrót</a>
+                                    </form>
+                                </div>
+                                <div class="col-lg-4 col-sm-12">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Textual inputs end -->
+            </div>
+        </div>
+    </div>
+</div>    
+{% endblock content %}

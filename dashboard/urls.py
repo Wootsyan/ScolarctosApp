@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import main, users, profile, schools
+from .views import main, users, profile, schools, teams
 
 app_name = 'dashboard'
 
@@ -24,4 +24,9 @@ urlpatterns = [
     path('schools/<int:pk>/', schools.SchoolsDetailView.as_view(), name='schools-detail'),
     path('schools/<int:pk>/edit/', schools.SchoolsUpdateView.as_view(), name='schools-edit'),
     path('schools/<int:pk>/delete/', schools.SchoolsDeleteView.as_view(), name='schools-delete'),
+    path('teams/', teams.TeamsListView.as_view(), name='teams-list'),
+    path('teams/new/', teams.TeamsCreateView.as_view(), name='teams-new'),
+    path('teams/<int:pk>/', teams.TeamsDetailView.as_view(), name='teams-detail'),
+    path('teams/<int:pk>/edit/', teams.TeamsUpdateView.as_view(), name='teams-edit'),
+    path('teams/<int:pk>/delete/', teams.TeamsDeleteView.as_view(), name='teams-delete'),
 ]

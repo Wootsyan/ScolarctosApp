@@ -51,6 +51,10 @@
                                                 <td>{{ user.data_joined|date:"Y-m-d" }}</td>
                                             </tr>
                                             <tr>
+                                                <th scope="row">Zespół:</th>
+                                                <td><a href="#">{{ user.team_set.get.name }}</a></td>
+                                            </tr>
+                                            <tr>
                                                 <th scope="row">Typ konta:</th>
                                                 <td>{{ user.user_type_name }}</td>
                                             </tr>

@@ -143,6 +143,24 @@
             ],
         });
     }
+    if ($('#dataTableTeams').length) {
+        $('#dataTableTeams').DataTable({
+            responsive: true,
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pl.json',
+            },
+            columnDefs: [
+                {
+                    targets: [-1],
+                    orderable: false,
+                },
+                {
+                    width: "15%",
+                    targets: 0
+                }
+            ],
+        });
+    }
 
 
     /*================================

@@ -16,6 +16,7 @@ class Team(models.Model):
         related_name="team_members", 
         related_query_name="team_member",)
     school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True, blank=True)
+    editable = models.BooleanField(default=True)
     added_date = models.DateField(default=timezone.now)
 
     def __str__(self):

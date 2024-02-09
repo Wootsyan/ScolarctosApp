@@ -48,7 +48,11 @@
                                             </tr>
                                             <tr>
                                                 <th scope="row">Dodano przez:</th>
+                                                {% if school.added_by %}
                                                 <td>{{ school.added_by.first_name }} {{ school.added_by.last_name }}<br />{{ school.added_by.email }}</td>
+                                                {% else %}
+                                                <td>Brak użytkownika</td>
+                                                {% endif %}
                                             </tr>
                                         </tbody>
                                     </table>

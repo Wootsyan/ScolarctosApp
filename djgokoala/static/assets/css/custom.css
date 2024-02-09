@@ -8,3 +8,7 @@
     color: #fff;
     font-size: 23px;
 }
+
+.text-primary a, .text-secondary a, .text-success a, .text-danger a, .text-warning a, .text-info a, .text-dark a{
+    font-family: 'Lato', sans-serif;
+}

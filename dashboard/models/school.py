@@ -27,4 +27,3 @@ class School(models.Model):
     def __str__(self):
         return f'Name: {self.name} | Street: {self.street} | Postcode: {self.postcode} | City: {self.city} | Type: {self.school_type} | Accepted: {self.accepted} | Date: {self.added_date}'
     
-    
