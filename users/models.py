@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _
 
 from .managers import CustomUserManager
 
-
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     STUDENT = 1
     GUARDIAN = 2
@@ -26,7 +25,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=9, validators=[MinLengthValidator(9)], unique=True, null=True, default=None, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
-    data_joined = models.DateTimeField(default=timezone.now)
+    date_joined = models.DateTimeField(default=timezone.now)
     description = models.TextField(blank=True)
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, default=STUDENT)
 

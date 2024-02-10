@@ -51,14 +51,14 @@
                                                 {% endif %}
                                             </td>                                            
                                             <td>
-                                                {% if team.team_tutor %}
-                                                <a href="{% url "dashboard:users-detail" team.team_tutor.tutor.id %}">{{ team.team_tutor.tutor.email }}</a>
+                                                {% if team.team_guardian %}
+                                                <a href="{% url "dashboard:users-detail" team.team_guardian.guardian.id %}">{{ team.team_guardian.guardian.email }}</a>
                                                 {% else %}
                                                 <span class="text-danger">Brak</span>
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                {% if team.team_tutor and not team.team_tutor.tutor.confirmation %}
+                                                {% if team.team_guardian and not team.team_guardian.guardian.confirmation %}
                                                 <i title="Tak" class="fa fa-circle text-success"></i>
                                                 {% else %}
                                                 <i title="Nie" class="fa fa-circle text-danger"></i>

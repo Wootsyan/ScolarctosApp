@@ -44,7 +44,7 @@
                                             <td>{{ user.first_name }}</td>
                                             <td>{{ user.last_name }}</td>                                            
                                             <td>{{ user.phone_number|default_if_none:"Brak" }}</td>
-                                            <td>{{ user.data_joined|date:"Y-m-d" }}</td>
+                                            <td>{{ user.date_joined|date:"Y-m-d" }}</td>
                                             <td>
                                                 <div>
                                                     {% if user.user_type == user.ADMIN and perms.users.view_admins or user.user_type == user.ORGANIZER and perms.users.view_organizers or user.user_type == user.STUDENT and perms.users.view_customuser or user.user_type == user.GUARDIAN and perms.users.view_customuser %}

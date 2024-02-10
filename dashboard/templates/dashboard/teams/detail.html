@@ -45,8 +45,8 @@
                                             <tr>
                                                 <th scope="row">Opiekun:</th>
                                                 <td>
-                                                    {% if team.team_tutor %}
-                                                    <a href="{% url "dashboard:users-detail" team.team_tutor.tutor %}">{{ team.team_tutor.tutor.email }}</a>
+                                                    {% if team.team_guardian %}
+                                                    <a href="{% url "dashboard:users-detail" team.team_guardian.guardian %}">{{ team.team_guardian.guardian.email }}</a>
                                                     {% else %}
                                                     <span class="text-danger">Brak</span>
                                                     {% endif %}
