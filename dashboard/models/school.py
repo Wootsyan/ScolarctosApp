@@ -23,13 +23,13 @@ class School(models.Model):
     accepted = models.BooleanField(default=False)
     added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     added_date = models.DateTimeField(default=timezone.now)
-    # guardians = models.ManyToManyField(
-    #     User, 
-    #     null=True, 
-    #     blank=True, 
-    #     related_name="guardians", 
-    #     related_query_name="guardians",
-    #     )
+    guardians = models.ManyToManyField(
+        User, 
+        null=True, 
+        blank=True, 
+        related_name="guardians", 
+        related_query_name="guardians",
+        )
 
     def __str__(self):
         return f'Name: {self.name} | Street: {self.street} | Postcode: {self.postcode} | City: {self.city} | Type: {self.school_type} | Accepted: {self.accepted} | Date: {self.added_date}'

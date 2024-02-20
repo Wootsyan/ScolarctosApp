@@ -1,0 +1,86 @@
+{% extends "dashboard/base.html" %}
+{% load index_list %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+<li><a href="{% url "dashboard:schools-guardian-list" %}">Twoje szkoły</a></li>
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+<div class="main-content-inner">
+    <div class="row justify-content-md-center">
+        <div class="col-lg-10 col-ml-10 col-sm-12">
+            <div class="row">
+                <!-- Textual inputs start -->
+                <div class="col-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title">Edytuj listę szkół</h4>
+                            <div class="row">
+                                <div class="col-lg-12 col-sm-12">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        {% if schools %}
+                                        <div class="data-tables datatable-dark">
+                                            <table id="dataTableSchoolsGuardian" class="text-center">
+                                                <thead class="">
+                                                    <tr>
+                                                        <th class="desktop">Nazwa szkoły</th>
+                                                        <th class="desktop">Ulica</th>
+                                                        <th class="desktop">Kod pocztowy</th>
+                                                        <th class="desktop">Miasto</th>
+                                                        <th class="desktop">Dołącz</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for school in schools %}
+                                                    <tr>
+                                                        <td>{{ school.name }}</td>
+                                                        <td>{{ school.street }}</td>
+                                                        <td>{{ school.postcode }}</td>                                            
+                                                        <td>{{ school.city }}</td>
+                                                        <td>
+                                                            <div class="datatable-checkbox">
+                                                                {{ form.schools|index:forloop.counter0}}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        {% else %} 
+                                        <p class="text-danger">Lista szkół jest pusta</p>
+                                        {% endif %}
+                                        <button type="submit" class="btn btn-primary mt-4 pr-4 pl-4" name="_save">Zapisz</button>
+                                        <button type="submit" class="btn btn-primary mt-4 pr-4 pl-4 opacity-75" name="_continue">Zapisz i kontynuuj edycję</button>
+                                        <a href="{% url "dashboard:schools-guardian-list" %}" class="btn btn-warning mt-4 pr-4 pl-4" role="button" aria-pressed="true">Powrót</a>
+                                    </form>
+                                </div>
+                                <div class="col-lg-4 col-sm-12">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Textual inputs end -->
+            </div>
+        </div>
+    </div>
+</div>    
+{% endblock content %}
+{% block additionalthemecss %}
+<!-- Start datatable css -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.jqueryui.min.css">
+{% endblock additionalthemecss %}
+{% block additionalthemescripts %}
+<!-- Start datatable js -->
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+<script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
+{% endblock additionalthemescripts %}

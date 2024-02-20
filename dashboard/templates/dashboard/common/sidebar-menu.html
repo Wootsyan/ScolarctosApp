@@ -35,6 +35,9 @@
                             <li class="{% if request.resolver_match.url_name == "schools-list" %}active{% endif %}"><a href="{% url "dashboard:schools-list" %}">Wszystkie</a></li>
                             <li class="{% if request.resolver_match.url_name == "schools-list-type" and school_type == 1 %}active{% endif %}"><a href="{% url "dashboard:schools-list-type" 1 %}">Podstawowe</a></li>
                             <li class="{% if request.resolver_match.url_name == "schools-list-type" and school_type == 2 %}active{% endif %}"><a href="{% url "dashboard:schools-list-type" 2 %}">Ponadpodstawowe</a></li>
+                            {% if user.user_type == user.GUARDIAN %}
+                            <li class="{% if request.resolver_match.url_name == "schools-guardian-list" %}active{% endif %}"><a href="{% url "dashboard:schools-guardian-list" %}">Moje szkoły</a></li> 
+                            {% endif %}
                             {% if perms.dashboard.add_school %}
                             <li class="{% if request.resolver_match.url_name == "schools-new" %}active{% endif %}"><a href="{% url "dashboard:schools-new" %}">Dodaj</a></li>
                             {% endif %}                            

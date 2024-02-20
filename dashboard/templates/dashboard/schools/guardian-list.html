@@ -1,0 +1,81 @@
+{% extends "dashboard/base.html" %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+        <div class="main-content-inner">
+            <div class="row">
+                <!-- Dark table start -->
+                <div class="col-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-lg-6">
+                                    <h4 class="header-title">Twoje szkoły</h4>
+                                </div>
+                                <div class="col-lg-6 d-flex justify-content-lg-end">
+                                    <a href="{% url "dashboard:schools-guardian-edit" %}" class="btn btn-primary" role="button" aria-pressed="true">Edytuj listę szkół</a>
+                                </div>
+                            </div>
+                            {% if schools %}
+                            <div class="data-tables datatable-dark">
+                                <table id="dataTableSchools" class="text-center">
+                                    <thead class="">
+                                        <tr>
+                                            <th class="desktop">Nazwa szkoły</th>
+                                            <th class="desktop">Ulica</th>
+                                            <th class="desktop">Kod pocztowy</th>
+                                            <th class="desktop">Miasto</th>
+                                            <th class="desktop">Typ szkoły</th>
+                                            <th class="desktop">Akcja</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for school in schools %}
+                                        <tr>
+                                            <td>{{ school.name }}</td>
+                                            <td>{{ school.street }}</td>
+                                            <td>{{ school.postcode }}</td>                                            
+                                            <td>{{ school.city }}</td>
+                                            <td>{% if school.school_type == 1 %}Podstawowa{% elif school.school_type == 2 %}Ponadpodstawowa{% endif %}</td>
+                                            <td>
+                                                <div>
+                                                    {% if perms.dashboard.view_school %}
+                                                    <a href="{% url "dashboard:schools-detail" school.id %}" class="btn btn-info" role="button" aria-pressed="true">
+                                                        <i class="ti-info"></i>
+                                                    </a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %} 
+                            <p class="text-danger">Lista szkół jest pusta</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Dark table end -->
+            </div>
+        </div>
+{% endblock content %}
+{% block additionalthemecss %}
+<!-- Start datatable css -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.jqueryui.min.css">
+{% endblock additionalthemecss %}
+{% block additionalthemescripts %}
+<!-- Start datatable js -->
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+<script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
+{% endblock additionalthemescripts %}

@@ -1,8 +1,9 @@
-from django.forms import ModelForm
+from django.forms import Form, ModelForm, ModelMultipleChoiceField, CheckboxSelectMultiple
 from django.db.models.functions import Lower
 
 from dashboard.models import Team, School
-from dashboard.fields import SchoolChoiceField
+from dashboard.fields import SchoolChoiceField, SchoolGuardianMultipleChoiceField
+from users.models import CustomUser
 
 class CreateTeamForm(ModelForm):
     school = SchoolChoiceField(queryset=School.objects.filter(accepted=True).order_by(Lower('name')))
@@ -25,3 +26,16 @@ class CreateTeamForm(ModelForm):
             'description',
             'editable'
         ]
+
+class SchoolsGuardianForm(Form):
+    schools = SchoolGuardianMultipleChoiceField(
+        queryset=None,
+        widget=CheckboxSelectMultiple,
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super().__init__(*args, **kwargs)
+
+        self.fields['schools'].queryset = School.objects.filter(accepted=True).order_by(Lower('name'))
+        self.initial['schools'] = self.request.user.guardians.all()

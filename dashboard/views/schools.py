@@ -4,11 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic.detail import DetailView
+from django.db.models.functions import Lower
 
 from dashboard.models import School
 from users.models import CustomUser
+from dashboard.forms import SchoolsGuardianForm
 
 '''
 ### Schools Views
@@ -42,6 +44,25 @@ class SchoolsListView(PermissionRequiredMixin, ListView):
             return School.objects.filter(school_type=school_type)
         
         return School.objects.all()
+    
+@method_decorator(login_required, name='dispatch')
+class SchoolsGuardianListView(PermissionRequiredMixin, ListView):
+    context_object_name = 'schools'
+    template_name = 'dashboard/schools/guardian-list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(SchoolsGuardianListView, self).get_context_data(**kwargs)
+        context['page_name'] = 'Moje szkoły'
+        return context
+    
+    def get_queryset(self):    
+        return self.request.user.guardians.all()
+    
+    def has_permission(self):
+        if self.request.user.user_type == CustomUser.GUARDIAN:
+            return True
+        else:
+            return False
     
 @method_decorator(login_required, name='dispatch')
 class SchoolsDetailView(PermissionRequiredMixin, DetailView):
@@ -138,6 +159,41 @@ class SchoolsUpdateView(PermissionRequiredMixin, UpdateView):
             return reverse_lazy('dashboard:schools-detail', kwargs=kwargs)
         elif '_continue' in self.request.POST:
             return reverse_lazy('dashboard:schools-edit', kwargs=kwargs)
+
+@method_decorator(login_required, name='dispatch')
+class SchoolsGuardianUpdateView(PermissionRequiredMixin, FormView):
+    context_object_name = 'schools'
+    template_name = 'dashboard/schools/guardian-edit.html'
+    form_class = SchoolsGuardianForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'request': self.request})
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super(SchoolsGuardianUpdateView, self).get_context_data(**kwargs)
+        context['page_name'] = f"Edycja listy Twoich szkół"
+        context['schools'] = School.objects.filter(accepted=True).order_by(Lower('name'))
+        return context
+
+    def has_permission(self):
+        if self.request.user.user_type == CustomUser.GUARDIAN:
+            return True
+        else:
+            return False
+        
+    def form_valid(self, form):
+        # Check if removed school from list is not connected with guardian's team
+        self.request.user.guardians.set(form.cleaned_data['schools'])
+        self.request.user.save()
+        return HttpResponseRedirect(self.get_success_url())
+        
+    def get_success_url(self):
+        if '_save' in self.request.POST:
+            return reverse_lazy('dashboard:schools-guardian-list')
+        elif '_continue' in self.request.POST:
+            return reverse_lazy('dashboard:schools-guardian-edit')
 
 @method_decorator(login_required, name='dispatch')
 class SchoolsDeleteView(PermissionRequiredMixin, DeleteView):
