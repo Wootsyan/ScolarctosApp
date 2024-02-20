@@ -57,13 +57,13 @@ class TeamsCreateView(PermissionRequiredMixin, CreateView):
     
     def form_valid(self, form):
         self.object = form.save() 
+        self.object.editable = True
         if self.request.user.user_type == CustomUser.STUDENT:
             self.object.leader = self.request.user
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
     
     def get_success_url(self):
-        self.object = self.get_object()
         kwargs = {'pk': self.object.id}
         if '_save' in self.request.POST:
             return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
@@ -94,6 +94,13 @@ class TeamsUpdateView(PermissionRequiredMixin, UpdateView):
             return True
         else:
             return self.request.user.has_perm('dashboard.change_team')
+        
+    def form_valid(self, form):
+        self.object = form.save()
+        if self.request.user == self.object.leader:
+            self.object.editable = True
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
         
     def get_success_url(self):
         self.object = self.get_object()
