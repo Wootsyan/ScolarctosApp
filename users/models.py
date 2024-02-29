@@ -5,9 +5,11 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .managers import CustomUserManager
+from gdpr.models import Gdpr
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     STUDENT = 1
+    STUDENT_TEAM_MEMBER = 11
     GUARDIAN = 2
     ORGANIZER = 3
     ADMIN = 4
@@ -28,6 +30,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     description = models.TextField(blank=True)
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, default=STUDENT)
+    gdpr = models.OneToOneField(Gdpr, null=True, blank=True, on_delete=models.CASCADE, related_name='gdpr')
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

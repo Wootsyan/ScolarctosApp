@@ -1,4 +1,4 @@
-from django.forms import Form, ModelForm, ModelMultipleChoiceField, CheckboxSelectMultiple
+from django.forms import Form, ModelForm, ModelMultipleChoiceField, CheckboxSelectMultiple, CharField, BooleanField
 from django.db.models.functions import Lower
 
 from dashboard.models import Team, School
@@ -26,6 +26,35 @@ class CreateTeamForm(ModelForm):
             'description',
             'editable'
         ]
+
+class CreateTeamMemberForm(ModelForm):
+    gdpr_consent = BooleanField(required=False)
+    parental_consent = BooleanField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        for field_name in ['first_name', 'last_name']:
+            self.fields[field_name].widget.attrs['class'] = 'form-control'
+        
+        for field_name in ['gdpr_consent', 'parental_consent']:
+            self.fields[field_name].widget.attrs['class'] = 'custom-control-input'
+    
+    class Meta:
+        model = CustomUser
+        fields = [ 
+            'first_name', 
+            'last_name',
+        ]
+
+class UpdateTeamMemberForm(CreateTeamMemberForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.initial['gdpr_consent'] = self.instance.gdpr.gdpr_consent
+        self.initial['parental_consent'] = self.instance.gdpr.parental_consent
+      
 
 class SchoolsGuardianForm(Form):
     schools = SchoolGuardianMultipleChoiceField(

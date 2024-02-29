@@ -134,6 +134,8 @@ class UserDetailView(PermissionRequiredMixin, DetailView):
             return self.request.user.has_perm('users.view_admins')
         elif context_user_object.user_type == CustomUser.ORGANIZER:
             return self.request.user.has_perm('users.view_organizers')
+        elif context_user_object.user_type == CustomUser.STUDENT_TEAM_MEMBER:
+            return False
         else:
             return self.request.user.has_perm('users.view_customuser')
 
@@ -163,6 +165,8 @@ class UserUpdateView(PermissionRequiredMixin, UpdateView):
             return self.request.user.has_perm('users.change_admins')
         elif context_user_object.user_type == CustomUser.ORGANIZER:
             return self.request.user.has_perm('users.change_organizers')
+        elif context_user_object.user_type == CustomUser.STUDENT_TEAM_MEMBER:
+            return False
         else:
             return self.request.user.has_perm('users.change_customuser')
     
@@ -191,6 +195,8 @@ class UserDeleteView(PermissionRequiredMixin, DeleteView):
             return self.request.user.has_perm('users.delete_admins')
         elif context_user_object.user_type == CustomUser.ORGANIZER:
             return self.request.user.has_perm('users.delete_organizers')
+        elif context_user_object.user_type == CustomUser.STUDENT_TEAM_MEMBER:
+            return False
         else:
             return self.request.user.has_perm('users.delete_customuser')
     

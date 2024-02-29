@@ -28,6 +28,7 @@ DEBUG = True
 
 SITE_URL = 'http://127.0.0.1:8000'
 ALLOWED_HOSTS = []
+SITE_DOMAIN = 'koala.pl'
 
 
 # Application definition
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'authentication',
     'dashboard',
     'files',
+    'gdpr',
 ]
 
 MIDDLEWARE = [

@@ -91,7 +91,7 @@
                 <div class="col-lg-6 col-md-12 mt-5">
                     <div class="card mb-2">
                         <div class="card-body">
-                            <h4 class="header-title text-center">Członkowie zespołu</h4>
+                            <h4 class="header-title text-center">Skład zespołu</h4>
                             <div class="single-table">
                                 <div class="table-responsive">
                                     <table class="table text-center">
@@ -105,38 +105,87 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            {% if team.leader %}
                                             <tr>
                                                 <th scope="row">1</th>
-                                                <td>{{ team.leader.first_name }} {{ team.leader.last_name }}</td>
-                                                <td><i class="fa fa-circle text-danger"></i></td>
-                                                <td><i class="fa fa-circle text-success"></i></td>
-                                                <td><i class="ti-trash"></i></td>
+                                                <td>{{ team.leader.first_name }} {{ team.leader.last_name }}<br>(Kapitan)</td>
+                                                <td>
+                                                    {% if team.leader.gdpr.parental_consent %}
+                                                    <i class="fa fa-circle text-success"></i>
+                                                    {% else %}
+                                                    <i class="fa fa-circle text-danger"></i>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if team.leader.gdpr.gdpr_consent %}
+                                                    <i class="fa fa-circle text-danger"></i>
+                                                    {% else %}
+                                                    <i class="fa fa-circle text-danger"></i>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if perms.dashboard.change_team %}
+                                                        <a href="#" class="btn btn-primary btn-xs" role="button" aria-pressed="true"><i class="ti-pencil"></i></a>
+                                                        <a href="{% url "dashboard:teams-leader-delete" team.id %}" class="btn btn-danger btn-xs" role="button" aria-pressed="true"><i class="ti-trash"></i></a>
+                                                    {% endif %}
+                                                </td>
                                             </tr>
+                                            {% else %}
                                             <tr>
-                                                <th scope="row">2</th>
-                                                <td>Jacek Nowaczewski</td>
-                                                <td><i class="fa fa-circle text-danger"></i></td>
-                                                <td><i class="fa fa-circle text-success"></i></td>
-                                                <td><i class="ti-trash"></i></td>
+                                                <th scope="row">1</th>
+                                                <td><span class="text-danger">Brak kapitana</span></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>
+                                                    <a href="#" class="btn btn-success btn-xs" role="button" aria-pressed="true"><i class="ti-plus"></i></a>
+                                                </td>
                                             </tr>
-                                            <tr>
-                                                <th scope="row">3</th>
-                                                <td>Wojciech Jackowski</td>
-                                                <td><i class="fa fa-circle text-danger"></i></td>
-                                                <td><i class="fa fa-circle text-danger"></i></td>
-                                                <td><i class="ti-trash"></i></td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">4</th>
-                                                <td>Małgorzata Proska</td>
-                                                <td><i class="fa fa-circle text-success"></i></td>
-                                                <td><i class="fa fa-circle text-success"></i></td>
-                                                <td><i class="ti-trash"></i></td>
-                                            </tr>
+                                            {% endif %}
+                                            {% if team.team_members.count %}
+                                                {% for team_member in team.team_members.all %}
+                                                <tr>
+                                                    <th scope="row">{{ forloop.counter|add:'1' }}</th>
+                                                    <td>{{ team_member.first_name }} {{ team_member.last_name }}</td>
+                                                    <td>
+                                                        {% if team_member.gdpr.parental_consent %}
+                                                        <i class="fa fa-circle text-success"></i>
+                                                        {% else %}
+                                                        <i class="fa fa-circle text-danger"></i>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if team_member.gdpr.gdpr_consent %}
+                                                        <i class="fa fa-circle text-success"></i>
+                                                        {% else %}
+                                                        <i class="fa fa-circle text-danger"></i>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if perms.dashboard.change_team or team.leader == user and team.editable %}
+                                                        <a href="{% url "dashboard:teams-members-edit" team_member.id %}" class="btn btn-primary btn-xs" role="button" aria-pressed="true"><i class="ti-pencil"></i></a>
+                                                        <a href="{% url "dashboard:teams-members-delete" team_member.id %}" class="btn btn-danger btn-xs" role="button" aria-pressed="true"><i class="ti-trash"></i></a>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            {% endif %}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
+                            {% if perms.dashboard.change_team or team.leader == user and team.editable %}
+                            <div class="mt-3 text-center">
+                                {% if team.team_members.count < team.MAX_MEMBERS %}
+                                <a href="{% url "dashboard:teams-members-new" team.id %}" class="btn btn-success" role="button" aria-pressed="true">
+                                    Dodaj nowego członka zespołu
+                                </a>
+                                {% else %}
+                                <a href="#" class="btn btn-success disabled" role="button" aria-disabled="true">
+                                    Dodaj nowego członka zespołu
+                                </a>
+                                {% endif %}
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="card">

@@ -5,6 +5,8 @@ from dashboard.models.school import School
 from dashboard.models.team_guardian import TeamGuardian
 
 class Team(models.Model):
+    MAX_MEMBERS = 3
+
     name = models.CharField(max_length=63, unique=True)
     description = models.TextField(blank=True)
     leader = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
