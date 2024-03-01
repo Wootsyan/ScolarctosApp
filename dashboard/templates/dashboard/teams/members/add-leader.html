@@ -1,0 +1,38 @@
+{% extends "dashboard/base.html" %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+<li><a href="{% url "dashboard:teams-detail" team.id %}">{{ team.name }}</a></li>
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+<div class="main-content-inner">
+    <div class="row justify-content-md-center">
+        <div class="col-lg-8 col-ml-10 col-sm-12">
+            <div class="row">
+                <!-- Textual inputs start -->
+                <div class="col-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title">Wybierz kapitana zespołu: {{ team.name }}</h4>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="{{ form.leader.id_for_label }}" class="col-form-label">Uczeń</label>
+                                        {{ form.leader }}
+                                        <div class="text-danger">{{ form.leader.errors }}</div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-4 pr-4 pl-4">Wybierz</button>
+                                <a href="{% url "dashboard:teams-detail" team.id %}" class="btn btn-warning mt-4 pr-4 pl-4" role="button" aria-pressed="true">Powrót</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- Textual inputs end -->
+            </div>
+        </div>
+    </div>
+</div>    
+{% endblock content %}

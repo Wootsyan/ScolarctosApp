@@ -1,0 +1,13 @@
+{% extends "dashboard/errors/base.html" %}
+{% block meta_title %}404 | Koala{% endblock meta_title %}
+{% block content %}
+<div class="error-area ptb--100 text-center">
+    <div class="container">
+        <div class="error-content">
+            <h2>404</h2>
+            <p>Ooops! Nie znaleziono zasobu.</p>
+            <a href="{% url "dashboard:index" %}">Wróć do panelu</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

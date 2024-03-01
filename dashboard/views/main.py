@@ -14,4 +14,4 @@ class IndexView(TemplateView):
 ### Others Views
 '''
 def error_403(request, exception):
-    return render(request, 'dashboard/errors/403.html')
+        return render(request, 'dashboard/errors/403.html')

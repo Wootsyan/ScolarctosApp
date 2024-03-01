@@ -52,7 +52,11 @@
                                             </tr>
                                             <tr>
                                                 <th scope="row">Zespół:</th>
-                                                <td><a href="#">{{ user.team_set.get.name }}</a></td>
+                                                {% if user.team_set.get %}
+                                                <td><a href="{% url "dashboard:teams-detail" user.team_set.get.id %}">{{ user.team_set.get.name }}</a></td>
+                                                {% else %}
+                                                <td></td>
+                                                {% endif %}
                                             </tr>
                                             <tr>
                                                 <th scope="row">Typ konta:</th>

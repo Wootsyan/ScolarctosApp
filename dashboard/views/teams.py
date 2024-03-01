@@ -4,14 +4,14 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.crypto import get_random_string
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from dashboard.models import Team
-from dashboard.forms import CreateTeamForm, CreateTeamMemberForm, UpdateTeamMemberForm
+from dashboard.forms import CreateTeamForm, CreateTeamMemberForm, UpdateTeamMemberForm, UpdateTeamLeaderForm, ConnectTeamLeaderForm
 from users.models import CustomUser
 from gdpr.models import Gdpr
 
@@ -233,6 +233,14 @@ class TeamsMembersDeleteView(PermissionRequiredMixin, DeleteView):
         context['team'] = self.get_object().team_members.first()
         return context
     
+    def form_valid(self, form):
+        self.team_member = self.get_object()
+        self.team = self.team_member.team_members.first()
+        self.team_member.gdpr.delete()
+        self.team_member.delete()
+        return HttpResponseRedirect(self.get_success_url(self.team))
+    
+    
     def has_permission(self):
         self.team = self.get_object().team_members.first()
         if self.request.user == self.team.leader and self.team.editable:
@@ -240,9 +248,8 @@ class TeamsMembersDeleteView(PermissionRequiredMixin, DeleteView):
         else:
             return self.request.user.has_perm('dashboard.change_team')
     
-    def get_success_url(self):
-        self.team = self.get_object().team_members.first()
-        kwargs = {'pk': self.team.id}
+    def get_success_url(self, team):
+        kwargs = {'pk': team.id}
         return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
     
 
@@ -259,12 +266,86 @@ class TeamsLeaderDisconnectView(PermissionRequiredMixin, DeleteView):
     
     def form_valid(self, form):
         self.team = self.get_object()
+        self.team.leader.gdpr.gdpr_consent = False
+        self.team.leader.gdpr.parental_consent = False
+        self.team.leader.gdpr.save()
         self.team.leader = None
         self.team.save()
         return HttpResponseRedirect(self.get_success_url())
 
     def has_permission(self):
         return self.request.user.has_perm('dashboard.change_team')
+    
+    def get_success_url(self):
+        self.team = self.get_object()
+        kwargs = {'pk': self.team.id}
+        return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
+    
+@method_decorator(login_required, name='dispatch')
+class TeamsLeaderUpdateView(PermissionRequiredMixin, UpdateView):
+    model = CustomUser
+    context_object_name = 'leader'
+    template_name = 'dashboard/teams/members/edit-leader.html'
+    form_class = UpdateTeamLeaderForm
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            requested_team = Team.objects.get(pk=self.kwargs["team_id"])
+        except Team.DoesNotExist:
+            return HttpResponseNotFound()
+        
+        if requested_team != self.get_object().team_set.first():
+            return HttpResponseNotFound()
+        
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(TeamsLeaderUpdateView, self).get_context_data(**kwargs)
+        context['page_name'] = f"Edytuj kapitana zespołu: {context['leader'].first_name} {context['leader'].last_name}"
+        context['team'] = self.get_object().team_set.first()
+        return context
+    
+    def has_permission(self):
+        return self.request.user.has_perm('dashboard.change_team')
+        
+    def form_valid(self, form):
+        leader = form.save()
+        leader.gdpr.gdpr_consent = form.cleaned_data['gdpr_consent']
+        leader.gdpr.parental_consent = form.cleaned_data['parental_consent']
+        leader.gdpr.save()
+        return HttpResponseRedirect(self.get_success_url())
+    
+    def get_success_url(self):
+        self.team = self.get_object().team_set.first()
+        kwargs = {'pk': self.team.id}
+        return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
+    
+@method_decorator(login_required, name='dispatch')
+class TeamsLeaderConnectView(PermissionRequiredMixin, UpdateView):
+    model = Team
+    context_object_name = 'team'
+    template_name = 'dashboard/teams/members/add-leader.html'
+    form_class = ConnectTeamLeaderForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_name'] = f"Wybierz kapitana zespołu: {context['team'].name}"
+        return context
+    
+    def has_permission(self):
+        return self.request.user.has_perm('dashboard.change_team')
+        
+    def form_valid(self, form):
+        team = form.save()
+        if team.leader.gdpr is None:
+            team_leader_gdpr = Gdpr.objects.create()
+            team_leader_gdpr.save()
+            team.leader.gdpr = team_leader_gdpr
+            team.leader.save()
+
+        team.save()
+        return HttpResponseRedirect(self.get_success_url())
     
     def get_success_url(self):
         self.team = self.get_object()

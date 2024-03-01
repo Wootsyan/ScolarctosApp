@@ -118,14 +118,14 @@
                                                 </td>
                                                 <td>
                                                     {% if team.leader.gdpr.gdpr_consent %}
-                                                    <i class="fa fa-circle text-danger"></i>
+                                                    <i class="fa fa-circle text-success"></i>
                                                     {% else %}
                                                     <i class="fa fa-circle text-danger"></i>
                                                     {% endif %}
                                                 </td>
                                                 <td>
                                                     {% if perms.dashboard.change_team %}
-                                                        <a href="#" class="btn btn-primary btn-xs" role="button" aria-pressed="true"><i class="ti-pencil"></i></a>
+                                                        <a href="{% url "dashboard:teams-leader-edit" team.id team.leader.id %}" class="btn btn-primary btn-xs" role="button" aria-pressed="true"><i class="ti-pencil"></i></a>
                                                         <a href="{% url "dashboard:teams-leader-delete" team.id %}" class="btn btn-danger btn-xs" role="button" aria-pressed="true"><i class="ti-trash"></i></a>
                                                     {% endif %}
                                                 </td>
@@ -137,7 +137,7 @@
                                                 <td></td>
                                                 <td></td>
                                                 <td>
-                                                    <a href="#" class="btn btn-success btn-xs" role="button" aria-pressed="true"><i class="ti-plus"></i></a>
+                                                    <a href="{% url "dashboard:teams-leader-new" team.id %}" class="btn btn-success btn-xs" role="button" aria-pressed="true"><i class="ti-plus"></i></a>
                                                 </td>
                                             </tr>
                                             {% endif %}

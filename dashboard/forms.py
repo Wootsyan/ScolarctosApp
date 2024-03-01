@@ -1,8 +1,8 @@
-from django.forms import Form, ModelForm, ModelMultipleChoiceField, CheckboxSelectMultiple, CharField, BooleanField
+from django.forms import Form, ModelForm, CheckboxSelectMultiple, Select, BooleanField
 from django.db.models.functions import Lower
 
 from dashboard.models import Team, School
-from dashboard.fields import SchoolChoiceField, SchoolGuardianMultipleChoiceField
+from dashboard.fields import SchoolChoiceField, SchoolGuardianMultipleChoiceField, TeamLeaderChoiceField
 from users.models import CustomUser
 
 class CreateTeamForm(ModelForm):
@@ -54,7 +54,31 @@ class UpdateTeamMemberForm(CreateTeamMemberForm):
 
         self.initial['gdpr_consent'] = self.instance.gdpr.gdpr_consent
         self.initial['parental_consent'] = self.instance.gdpr.parental_consent
-      
+
+class UpdateTeamLeaderForm(UpdateTeamMemberForm):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        for field_name in ['first_name', 'last_name']:
+            self.fields[field_name].disabled = True
+
+class ConnectTeamLeaderForm(ModelForm):
+    leader = TeamLeaderChoiceField(
+        queryset=CustomUser.objects.filter(is_active=True, user_type=CustomUser.STUDENT, team__isnull=True),
+        widget=Select,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.fields['leader'].widget.attrs['class'] = 'form-control'
+
+    class Meta:
+        model = Team
+        fields = [ 
+            'leader',
+        ]
 
 class SchoolsGuardianForm(Form):
     schools = SchoolGuardianMultipleChoiceField(
