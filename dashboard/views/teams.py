@@ -1,15 +1,13 @@
-import string
 from django.urls import reverse_lazy
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.utils.crypto import get_random_string
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
+from dashboard.utils import generate_team_member_email
 from dashboard.models import Team
 from dashboard.forms import CreateTeamForm, CreateTeamMemberForm, UpdateTeamMemberForm, UpdateTeamLeaderForm, ConnectTeamLeaderForm
 from users.models import CustomUser
@@ -166,9 +164,7 @@ class TeamsMembersCreateView(PermissionRequiredMixin, SingleObjectMixin, FormVie
     def form_valid(self, form):
         team_member = form.save()
         self.team = self.get_object()
-        team_member_email = f"{team_member.first_name}.{team_member.last_name}.{self.team.name}.{get_random_string(length=3, allowed_chars=string.digits)}@{settings.SITE_DOMAIN}"
-        team_member_email = team_member_email.lower().replace(' ', '_')
-        team_member.email = team_member_email
+        team_member.email = generate_team_member_email(team_member.first_name, team_member.last_name, self.team.name)
         team_member.user_type = CustomUser.STUDENT_TEAM_MEMBER
         team_member_gdpr = Gdpr.objects.create(gdpr_consent=form.cleaned_data['gdpr_consent'], parental_consent=form.cleaned_data['parental_consent'])
         team_member_gdpr.save()
@@ -206,9 +202,7 @@ class TeamsMembersUpdateView(PermissionRequiredMixin, UpdateView):
     def form_valid(self, form):
         team_member = form.save()
         if 'first_name' in form.changed_data or 'last_name' in form.changed_data:
-            team_member_email = f"{team_member.first_name}.{team_member.last_name}.{self.team.name}.{get_random_string(length=3, allowed_chars=string.digits)}@{settings.SITE_DOMAIN}"
-            team_member_email = team_member_email.lower().replace(' ', '_')
-            team_member.email = team_member_email
+            team_member.email = generate_team_member_email(team_member.first_name, team_member.last_name, self.team.name)
         
         team_member.gdpr.gdpr_consent = form.cleaned_data['gdpr_consent']
         team_member.gdpr.parental_consent = form.cleaned_data['parental_consent']
