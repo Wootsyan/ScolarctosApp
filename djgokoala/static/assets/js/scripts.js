@@ -292,4 +292,11 @@
         return confirm('Czy na pewno chcesz usunąć?');
     })
 
+    $('.custom-file-input').on('change', function () {
+        for (let i = 0; i < $(this).length; i++) {
+            let fileName = $(this)[i].files[0].name;
+            $(this)[i].nextElementSibling.innerText = fileName;
+        }
+    })
+
 })(jQuery);

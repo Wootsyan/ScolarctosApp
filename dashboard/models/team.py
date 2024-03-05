@@ -3,6 +3,7 @@ from django.utils import timezone
 from users.models import CustomUser as User
 from dashboard.models.school import School
 from dashboard.models.team_guardian import TeamGuardian
+from files.models import File
 
 class Team(models.Model):
     MAX_MEMBERS = 3
@@ -20,6 +21,12 @@ class Team(models.Model):
         )
     school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True, blank=True)
     editable = models.BooleanField(default=True)
+    files = models.ManyToManyField(
+        File, 
+        null=True, 
+        blank=True, 
+        related_name="teams",
+    )
     added_date = models.DateField(default=timezone.now)
 
     def __str__(self):

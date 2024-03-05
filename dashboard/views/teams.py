@@ -4,12 +4,12 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView, FormMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from dashboard.utils import generate_team_member_email
 from dashboard.models import Team
-from dashboard.forms import CreateTeamForm, CreateTeamMemberForm, UpdateTeamMemberForm, UpdateTeamLeaderForm, ConnectTeamLeaderForm
+from dashboard.forms import CreateTeamForm, CreateTeamMemberForm, UpdateTeamMemberForm, UpdateTeamLeaderForm, ConnectTeamLeaderForm, TeamsAddFile
 from users.models import CustomUser
 from gdpr.models import Gdpr
 
@@ -30,21 +30,43 @@ class TeamsListView(PermissionRequiredMixin, ListView):
         return context
     
 @method_decorator(login_required, name='dispatch')
-class TeamsDetailView(PermissionRequiredMixin, DetailView):
+class TeamsDetailView(PermissionRequiredMixin, FormMixin, DetailView):
     model = Team
     context_object_name = 'team'
     template_name = 'dashboard/teams/detail.html'
+    form_class = TeamsAddFile
 
     def get_context_data(self, **kwargs):
         context = super(TeamsDetailView, self).get_context_data(**kwargs)
         context['page_name'] = f"{context['team'].name}"
         return context
     
+    def form_valid(self, form):
+        uploaded_file = form.save()
+        uploaded_file.name = uploaded_file.path.name.split('/')[-1]
+        uploaded_file.save()
+        self.team = self.get_object()
+        self.team.files.add(uploaded_file)
+        self.team.save()
+        return HttpResponseRedirect(self.get_success_url())
+    
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+    
     def has_permission(self):
-        if self.get_object() == Team.objects.filter(leader=self.request.user).first():
+        if self.get_object().leader == self.request.user:
             return True
         else:
             return self.request.user.has_perm('dashboard.view_team')
+        
+    def get_success_url(self):
+        kwargs = {'pk': self.object.id}
+        return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
 
 @method_decorator(login_required, name='dispatch')
 class TeamsCreateView(PermissionRequiredMixin, CreateView):

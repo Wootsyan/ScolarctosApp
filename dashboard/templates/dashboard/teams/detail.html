@@ -11,7 +11,7 @@
         <div class="col-lg-10 col-ml-10 col-sm-12">
             <div class="row">
                 <div class="col-lg-6 col-md-12 mt-5">
-                    <div class="card">
+                    <div class="card mb-2">
                         <div class="card-body">
                             <h4 class="header-title text-center">Szczegóły zespołu</h4>
                             <div class="single-table">
@@ -82,9 +82,67 @@
                                 </a>
                                 {% endif %}
                                 {% if team.leader == user and not team.editable %}
-                                    <div class="text-info">Organizatorzy zablokowali możliwość edycji Twojego zespołu. Skontaktuj się z nimi, jeśli z jakiegoś powodu musisz wprowadzić zmiany w zespole.</div>
+                                    <div class="text-info">Organizatorzy zablokowali możliwość edycji Twojego zespołu oraz dodawania plików. Skontaktuj się z nimi, jeśli z jakiegoś powodu musisz wprowadzić zmiany w zespole.</div>
                                 {% endif %}
                             </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title text-center">Pliki</h4>
+                            <div id="accordion3" class="according accordion-s3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="collapsed card-link" data-toggle="collapse" href="#accordion31" aria-expanded="true">Zgody rodzica i RODO</a>
+                                    </div>
+                                    <div id="accordion31" class="collapse" data-parent="#accordion3" style="">
+                                        <div class="card-body">
+                                            {% if team.files %}
+                                                {% for file in team.files.all %}
+                                                    <div class="row">
+                                                        <div class="col-lg-1">
+                                                            {% if 'pdf' in file.name %}
+                                                            <i class="fa fa-file-pdf-o"></i>
+                                                            {% else %}
+                                                            <i class="fa fa-file-image-o"></i>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-lg-10">
+                                                            <a href="#" title="{{ file.name }}">{{ file.name }}</a>
+                                                        </div>
+                                                        <div class="col-lg-1">
+                                                            <a href="#" title="Usuń"><i class="fa fa-trash-o text-danger"></i></a>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if perms.dashboard.change_team or team.leader == user and team.editable %}
+                            <div class="mt-3 text-center">
+                                <form method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="form-row">
+                                        <div class="col-md-12 mb-3">
+                                            <div class="input-group">
+                                                <div class="custom-file">
+                                                    {{ form.path }}
+                                                    <label for="{{ form.path.id_for_label }}" class="custom-file-label">
+                                                        Wybierz plik {% if form.valid_extensions %}({{ form.valid_extensions|join:", " }}){% endif %}
+                                                    </label>
+                                                </div>
+                                                <div class="input-group-append">
+                                                    <button type="submit" class="btn btn-outline-primary" type="button">Prześlij</button>
+                                                </div>
+                                            </div>
+                                            <div class="text-danger">{{ form.path.errors }}</div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
