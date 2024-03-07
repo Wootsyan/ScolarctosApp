@@ -12,6 +12,7 @@ from dashboard.models import Team
 from dashboard.forms import CreateTeamForm, CreateTeamMemberForm, UpdateTeamMemberForm, UpdateTeamLeaderForm, ConnectTeamLeaderForm, TeamsAddFile
 from users.models import CustomUser
 from gdpr.models import Gdpr
+from files.models import File
 
 '''
 ### Teams Views
@@ -42,12 +43,14 @@ class TeamsDetailView(PermissionRequiredMixin, FormMixin, DetailView):
         return context
     
     def form_valid(self, form):
-        uploaded_file = form.save()
-        uploaded_file.name = uploaded_file.path.name.split('/')[-1]
-        uploaded_file.save()
+        # First create instance of File and add to Team for getting Team instance for upload_to in FileField
+        uploaded_file = File.objects.create()
         self.team = self.get_object()
         self.team.files.add(uploaded_file)
         self.team.save()
+        uploaded_file.path = form.cleaned_data['path']
+        uploaded_file.name = uploaded_file.path.name.split('/')[-1]
+        uploaded_file.save()
         return HttpResponseRedirect(self.get_success_url())
     
     def post(self, request, *args, **kwargs):
@@ -255,8 +258,7 @@ class TeamsMembersDeleteView(PermissionRequiredMixin, DeleteView):
         self.team_member.gdpr.delete()
         self.team_member.delete()
         return HttpResponseRedirect(self.get_success_url(self.team))
-    
-    
+
     def has_permission(self):
         self.team = self.get_object().team_members.first()
         if self.request.user == self.team.leader and self.team.editable:
@@ -366,4 +368,33 @@ class TeamsLeaderConnectView(PermissionRequiredMixin, UpdateView):
     def get_success_url(self):
         self.team = self.get_object()
         kwargs = {'pk': self.team.id}
+        return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
+
+@method_decorator(login_required, name='dispatch')
+class TeamsFileDeleteView(PermissionRequiredMixin, DeleteView):
+    model = File
+    context_object_name = 'file'
+    template_name = 'dashboard/teams/files/delete.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_name'] = f"Usuwanie pliku: {context['file'].name}"
+        context['team'] = self.get_object().teams.first()
+        return context
+    
+    def form_valid(self, form):
+        self.file = self.get_object()
+        self.team = self.file.teams.first()
+        self.file.delete()
+        return HttpResponseRedirect(self.get_success_url(self.team))
+    
+    def has_permission(self):
+        self.team = self.get_object().teams.first()
+        if self.request.user == self.team.leader and self.team.editable:
+            return True
+        else:
+            return self.request.user.has_perm('dashboard.change_team')
+    
+    def get_success_url(self, team):
+        kwargs = {'pk': team.id}
         return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)

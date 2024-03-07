@@ -82,7 +82,7 @@
                                 </a>
                                 {% endif %}
                                 {% if team.leader == user and not team.editable %}
-                                    <div class="text-info">Organizatorzy zablokowali możliwość edycji Twojego zespołu oraz dodawania plików. Skontaktuj się z nimi, jeśli z jakiegoś powodu musisz wprowadzić zmiany w zespole.</div>
+                                    <div class="text-info">Organizatorzy zablokowali możliwość edycji Twojego zespołu oraz dodawania i usuwania plików. Skontaktuj się z nimi, jeśli z jakiegoś powodu musisz wprowadzić zmiany w zespole.</div>
                                 {% endif %}
                             </div>
                         </div>
@@ -93,11 +93,11 @@
                             <div id="accordion3" class="according accordion-s3">
                                 <div class="card">
                                     <div class="card-header">
-                                        <a class="collapsed card-link" data-toggle="collapse" href="#accordion31" aria-expanded="true">Zgody rodzica i RODO</a>
+                                        <a class="card-link" data-toggle="collapse" href="#accordion31" aria-expanded="true">Zgody rodzica i RODO</a>
                                     </div>
-                                    <div id="accordion31" class="collapse" data-parent="#accordion3" style="">
+                                    <div id="accordion31" class="collapse show" data-parent="#accordion3">
                                         <div class="card-body">
-                                            {% if team.files %}
+                                            {% if team.files.exists %}
                                                 {% for file in team.files.all %}
                                                     <div class="row">
                                                         <div class="col-lg-1">
@@ -108,13 +108,17 @@
                                                             {% endif %}
                                                         </div>
                                                         <div class="col-lg-10">
-                                                            <a href="#" title="{{ file.name }}">{{ file.name }}</a>
+                                                            <a href="/{{ file.path }}" title="{{ file.name }}" target="_blank">{{ file.name }}</a>
                                                         </div>
                                                         <div class="col-lg-1">
-                                                            <a href="#" title="Usuń"><i class="fa fa-trash-o text-danger"></i></a>
+                                                            {% if perms.dashboard.delete_team or team.leader == user and team.editable %}
+                                                            <a href="{% url "dashboard:teams-file-delete" team.id file.id %}" title="Usuń"><i class="fa fa-trash-o text-danger"></i></a>
+                                                            {% endif %}
                                                         </div>
                                                     </div>
                                                 {% endfor %}
+                                            {% else %}
+                                            <div class="text-info text-center">Brak dołączonych plików</div>
                                             {% endif %}
                                         </div>
                                     </div>

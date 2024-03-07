@@ -37,4 +37,5 @@ urlpatterns = [
     path('teams/<int:pk>/members/new/', teams.TeamsMembersCreateView.as_view(), name='teams-members-new'),
     path('teams/members/<int:pk>/edit/', teams.TeamsMembersUpdateView.as_view(), name='teams-members-edit'),
     path('teams/members/<int:pk>/delete/', teams.TeamsMembersDeleteView.as_view(), name='teams-members-delete'),
+    path('teams/<int:team_id>/file/<int:pk>/delete/', teams.TeamsFileDeleteView.as_view(), name='teams-file-delete'),
 ]

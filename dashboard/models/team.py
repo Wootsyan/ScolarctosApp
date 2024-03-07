@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.utils import timezone
 from users.models import CustomUser as User
@@ -31,3 +32,15 @@ class Team(models.Model):
 
     def __str__(self):
         return f'Name: {self.name} | Desc: {self.description} | Leader: {self.leader} | Guardian: {self.team_guardian} | School: {self.school} | Date: {self.added_date}'
+    
+    def delete(self, **kwargs):
+        self.team_members.all().delete()
+        # Must delete each file separately
+        if self.files.exists():
+            first_file = self.files.first()
+            files_dir = first_file.path.path
+            files_dir = files_dir.replace(first_file.name, '')
+            for file in self.files.all():
+                file.delete()
+            os.rmdir(files_dir)
+        return super().delete(**kwargs)
