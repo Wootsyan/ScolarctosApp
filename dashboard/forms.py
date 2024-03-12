@@ -1,11 +1,11 @@
 from django.forms import Form, ModelForm, CheckboxSelectMultiple, Select, BooleanField
 from django.db.models.functions import Lower
+from django.core.validators import FileExtensionValidator 
 
 from dashboard.models import Team, School
 from dashboard.fields import SchoolChoiceField, SchoolGuardianMultipleChoiceField, TeamLeaderChoiceField
 from users.models import CustomUser
 from files.models import File
-from files.validators import FileExtenstionValidator
 
 class CreateTeamForm(ModelForm):
     school = SchoolChoiceField(queryset=School.objects.filter(accepted=True).order_by(Lower('name')))
@@ -97,16 +97,16 @@ class SchoolsGuardianForm(Form):
 
 class TeamsAddFile(ModelForm):
     valid_extensions = [
-        '.pdf', 
-        '.jpg',
-        '.png',
+        'PDF', 
+        'JPG',
+        'PNG',
         ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields['path'].widget.attrs['class'] = 'custom-file-input'
-        self.fields['path'].validators = [FileExtenstionValidator(self.valid_extensions)]
+        self.fields['path'].validators = [FileExtensionValidator(self.valid_extensions)]
 
     class Meta:
         model = File

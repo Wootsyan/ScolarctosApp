@@ -124,28 +124,33 @@
                                     </div>
                                 </div>
                             </div>
-                            {% if perms.dashboard.change_team or team.leader == user and team.editable %}
                             <div class="mt-3 text-center">
-                                <form method="post" enctype="multipart/form-data">
-                                    {% csrf_token %}
-                                    <div class="form-row">
-                                        <div class="col-md-12 mb-3">
-                                            <div class="input-group">
-                                                <div class="custom-file">
-                                                    {{ form.path }}
-                                                    <label for="{{ form.path.id_for_label }}" class="custom-file-label">
-                                                        Wybierz plik {% if form.valid_extensions %}({{ form.valid_extensions|join:", " }}){% endif %}
-                                                    </label>
-                                                </div>
-                                                <div class="input-group-append">
-                                                    <button type="submit" class="btn btn-outline-primary" type="button">Prześlij</button>
-                                                </div>
-                                            </div>
-                                            <div class="text-danger">{{ form.path.errors }}</div>
-                                        </div>
-                                    </div>
-                                </form>
+                                <p class="font-weight-bold">Limit: {{ team.files.count }}/{{ team.MAX_FILES }}</p>
                             </div>
+                            {% if team.files.count < team.MAX_FILES %}
+                                {% if perms.dashboard.change_team or team.leader == user and team.editable %}
+                                <div class="mt-3 text-center">
+                                    <form method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="form-row">
+                                            <div class="col-md-12 mb-3">
+                                                <div class="input-group">
+                                                    <div class="custom-file">
+                                                        {{ form.path }}
+                                                        <label for="{{ form.path.id_for_label }}" class="custom-file-label">
+                                                            Wybierz plik {% if form.valid_extensions %}({{ form.valid_extensions|join:", " }}){% endif %}
+                                                        </label>
+                                                    </div>
+                                                    <div class="input-group-append">
+                                                        <button type="submit" class="btn btn-outline-primary" type="button">Prześlij</button>
+                                                    </div>
+                                                </div>
+                                                <div class="text-danger">{{ form.path.errors }}</div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>

@@ -8,6 +8,7 @@ from files.models import File
 
 class Team(models.Model):
     MAX_MEMBERS = 3
+    MAX_FILES = 5
 
     name = models.CharField(max_length=63, unique=True)
     description = models.TextField(blank=True)
