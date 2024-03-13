@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.contrib.auth import get_user_model, authenticate, login as auth_login, logout as auth_logout
+from django.urls import reverse, reverse_lazy
+from django.contrib.auth.views import LoginView
+from django.contrib.auth import get_user_model, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.models import Group
+from django.http import HttpResponseRedirect
+from django.core.exceptions import NON_FIELD_ERRORS
 from .forms import RegisterForm, LoginForm
 from .utils import check_token, send_verification_mail, send_reset_password_mail
 from users.models import CustomGroup
@@ -11,38 +14,33 @@ def redirect_auth_user(request):
     if request.user.is_authenticated:
         return redirect('dashboard:index')
     else:
-        return redirect('login')
+        return redirect('auth:login')
 
-def login(request):
-    if request.user.is_authenticated:
-        return redirect('dashboard:index')
-    else:
-        if request.method == 'POST':
-            form = LoginForm(request.POST)
-            if form.is_valid():
-                email = form.cleaned_data["email"]
-                password = form.cleaned_data["password"]
-                user = authenticate(request, username=email, password=password)
-                if user is not None:
-                    if user.is_active:
-                        auth_login(request, user)
-                        return redirect('dashboard:index')
-                    else:
-                        error_login_message = 'Konto nie jest aktywne'
-                        inactive_user = True
-                else:
-                    error_login_message = 'Nieprawidłowy login lub hasło'
-                    inactive_user = False
-                return render(request, 'auth/login.html', {'form': form, 'error_login_message': error_login_message, 'inactive_user': inactive_user})
+class CustomLoginView(LoginView):
+    form_class = LoginForm
+    template_name = 'auth/login.html'
+    redirect_authenticated_user = True
 
-        else:
-            form = LoginForm()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["non_field_error_inactive"] = context["form"].has_error(NON_FIELD_ERRORS, code='inactive')
+        return context
 
-        return render(request, 'auth/login.html', {'form': form})
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        auth_login(self.request, form.get_user())
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard:index')
 
 def logout(request):
     auth_logout(request)
-    return redirect('login')
+    return redirect('auth:login')
 
 def register(request):
     if request.user.is_authenticated:
@@ -76,9 +74,9 @@ def verify_email(request, user_id=None, token=None):
             if user is not None and not user.is_active:
                 status = send_verification_mail(to_user=user)
             if status:
-                url = reverse('verify_email_resend_link') + '?verifylinksend=1'
+                url = reverse('auth:verify_email_resend_link') + '?verifylinksend=1'
             else:
-                url = reverse('verify_email_resend_link')
+                url = reverse('auth:verify_email_resend_link')
             return redirect(url)
         
         else:
