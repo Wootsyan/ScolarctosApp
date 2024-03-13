@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
-from django.contrib.auth.views import LoginView
-from django.contrib.auth import get_user_model, login as auth_login, logout as auth_logout
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth import get_user_model, login as auth_login
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
@@ -9,12 +9,6 @@ from django.core.exceptions import NON_FIELD_ERRORS
 from .forms import RegisterForm, LoginForm
 from .utils import check_token, send_verification_mail, send_reset_password_mail
 from users.models import CustomGroup
-
-def redirect_auth_user(request):
-    if request.user.is_authenticated:
-        return redirect('dashboard:index')
-    else:
-        return redirect('auth:login')
 
 class CustomLoginView(LoginView):
     form_class = LoginForm
@@ -38,9 +32,8 @@ class CustomLoginView(LoginView):
     def get_success_url(self):
         return reverse_lazy('dashboard:index')
 
-def logout(request):
-    auth_logout(request)
-    return redirect('auth:login')
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('auth:login')
 
 def register(request):
     if request.user.is_authenticated:
