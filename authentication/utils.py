@@ -39,7 +39,7 @@ def send_verification_mail(to_user):
     email_data = {
         'user_name': to_user.first_name,
         'verification_time': exp_minutes,
-        'verification_url': settings.SITE_URL + reverse('verify_email', args=(to_user.id, email_verify_token))
+        'verification_url': settings.SITE_URL + reverse('auth:verify_email', args=(to_user.id, email_verify_token))
     } 
 
     html_message = render_to_string(template_name="auth/email/email-confirmation.html", context=email_data)
@@ -64,7 +64,7 @@ def send_reset_password_mail(to_user):
     email_data = {
         'user_name': to_user.first_name,
         'reset_password_time': exp_minutes,
-        'reset_password_url': settings.SITE_URL + reverse('password_reset_change', args=(to_user.id, email_verify_token))
+        'reset_password_url': settings.SITE_URL + reverse('auth:password_reset_change', args=(to_user.id, email_verify_token))
     } 
 
     html_message = render_to_string(template_name="auth/email/password-reset.html", context=email_data)
