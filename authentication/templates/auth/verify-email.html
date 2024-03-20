@@ -6,7 +6,7 @@
 <div class="login-area">
     <div class="container">
         <div class="login-box ptb--100">
-                {% if not verifylinksend and not status %}
+                {% if verify_email_request %}
                 <form method="post">
                 {% csrf_token %}
                 {% else %}
@@ -16,7 +16,7 @@
                     <h4>Weryfikacja<br>adresu e-mail</h4>
                 </div>
                 <div class="login-form-body">
-                    {% if verifylinksend %}
+                    {% if verify_link_sent %}
                     <div class="alert alert-success mb-5" role="alert">
                         <h4 class="alert-heading">Sprawdź pocztę e-mail</h4>
                         <p>Link aktywacyjny został wysłany, jeśli w systemie istnieje konto na podany adres e-mail, które nie zostało jeszcze aktywowane.</p>
@@ -25,32 +25,39 @@
                     <div class="submit-btn-area mt-5">
                         <a href="{% url "auth:login" %}" class="btn btn-primary" role="button" aria-pressed="true">Przejdź do strony logowania</a>
                     </div>
-                    {% elif not status %}
+                    {% elif verify_email_request %}
+                    {% if token_invalid %}
                     <div class="alert alert-danger mb-5" role="alert">
                         <h4 class="alert-heading">Twoje konto nie zostało aktywowane</h4>
                         <p>Link aktywacyjny wygasł lub jest nieprawidłowy.</p>
                         <hr>
                         <p class="mb-2">Jeśli chcesz otrzymać nowy link aktywacyjny, podaj adres e-mail, na który założono konto, i kliknij przycisk poniżej.</p>
                     </div>
+                    {% endif %}
                                     
                     <div class="form-gp">
-                        <label for="id_email">Adres e-mail</label>
-                        <input type="email" name="email" maxlength="254" autofocus="" required="" id="id_email">
+                        <label for="{{ form.email.id_for_label }}">Adres e-mail</label>
+                        {{ form.email }}
                         <i class="ti-email"></i>
-                        <div class="text-danger"></div>
+                        <div class="text-danger">{{ form.email.errors }}</div>
                     </div>
                     <div class="submit-btn-area mt-5">
                         <button id="form_submit" type="submit">Wyślij ponownie link aktywacyjny <i class="ti-arrow-right"></i></button>
                     </div>
                     {% else %}
-                    <div class="alert alert-primary mb-5" role="alert">
-                        <h4 class="alert-heading">Konto zostało aktywowane</h4>
-                        <p>Twoje konto zostało aktywowane, teraz możesz przejść na stronę logowania i zalogować się do systemu.</p>
-                        <hr>
-                    </div>
-                    <div class="submit-btn-area mt-5">
-                        <a href="{% url "auth:login" %}" class="btn btn-primary" role="button" aria-pressed="true">Przejdź do strony logowania</a>
-                    </div>
+                        <div class="alert alert-primary mb-5" role="alert">
+                            {% if user_activated %}
+                            <h4 class="alert-heading">Konto zostało aktywowane</h4>
+                            <p>Twoje konto zostało aktywowane, teraz możesz przejść na stronę logowania i zalogować się do systemu.</p>
+                            {% elif user_already_active %}
+                            <h4 class="alert-heading">Konto było już aktywne</h4>
+                            <p>Twoje konto zostało aktywowane wcześniej, przejdź do strony logowania i zaloguj się do systemu.</p>
+                            {% endif %}
+                            <hr>
+                        </div>
+                        <div class="submit-btn-area mt-5">
+                            <a href="{% url "auth:login" %}" class="btn btn-primary" role="button" aria-pressed="true">Przejdź do strony logowania</a>
+                        </div>
                     {% endif %}
                 </div>
             </form>

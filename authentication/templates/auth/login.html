@@ -33,7 +33,7 @@
                                 {{ form.non_field_errors }}
                             </div>
                             {% if non_field_error_inactive %}
-                            <a href="{% url "auth:verify_email_resend_link" %}" role="button" class="btn btn-rounded btn-info btn-lg btn-block mb-3">Aktywuj konto</a>
+                            <a href="{% url "auth:verify-email-request" %}" role="button" class="btn btn-rounded btn-info btn-lg btn-block mb-3">Aktywuj konto</a>
                             {% endif %}
                         </div>
                     </div>
