@@ -8,8 +8,10 @@ from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.views.generic import FormView
+from django.utils.decorators import method_decorator
 from .forms import RegisterForm, LoginForm, VerifyEmailForm
 from .utils import check_token, send_verification_mail, send_reset_password_mail
+from .decorators import redirect_logged_user
 from users.models import CustomGroup
 
 class CustomLoginView(LoginView):
@@ -37,14 +39,10 @@ class CustomLoginView(LoginView):
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('auth:login')
 
+@method_decorator(redirect_logged_user, name='dispatch')
 class RegisterView(FormView):
     form_class = RegisterForm
     template_name = 'auth/register.html'	
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect(reverse_lazy('dashboard:index'))
-        return super().dispatch(request, *args, **kwargs)
     
     def form_valid(self, form):
         user = form.save()
@@ -64,14 +62,10 @@ class RegisterView(FormView):
     def get_success_url(self):
         return reverse_lazy('auth:register')
     
+@method_decorator(redirect_logged_user, name='dispatch')
 class VerifyEmailView(FormView):
     form_class = VerifyEmailForm
     template_name = 'auth/verify-email.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect(reverse_lazy('dashboard:index'))
-        return super().dispatch(request, *args, **kwargs)
     
     def get(self, request, *args, **kwargs):
         if 'user_id' in kwargs and 'token' in kwargs:
