@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
@@ -6,10 +6,11 @@ from django.contrib.auth import get_user_model, login as auth_login
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
-from django.core.exceptions import NON_FIELD_ERRORS
-from django.views.generic import FormView
+from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied
+from django.views.generic import FormView, TemplateView
+from django.views.generic.detail import SingleObjectMixin
 from django.utils.decorators import method_decorator
-from .forms import RegisterForm, LoginForm, VerifyEmailForm
+from .forms import RegisterForm, LoginForm, EmailForm
 from .utils import check_token, send_verification_mail, send_reset_password_mail
 from .decorators import redirect_logged_user
 from users.models import CustomGroup
@@ -64,7 +65,7 @@ class RegisterView(FormView):
     
 @method_decorator(redirect_logged_user, name='dispatch')
 class VerifyEmailView(FormView):
-    form_class = VerifyEmailForm
+    form_class = EmailForm
     template_name = 'auth/verify-email.html'
     
     def get(self, request, *args, **kwargs):
@@ -120,44 +121,101 @@ class VerifyEmailView(FormView):
     
     def get_success_url(self):
         return reverse_lazy('auth:verify-email-request')
-                
-def password_reset_request(request):
-    if request.user.is_authenticated:
-        return redirect('dashboard:index')
-    else:
-        if request.method == 'POST':
-            email = request.POST['email']
-            try:
-                user = get_user_model().objects.get(email=email)
-            except get_user_model().models.CustomUser.DoesNotExist:
-                user = None
-            resetlinksend = False
-            if user is not None:
-                resetlinksend = send_reset_password_mail(to_user=user)
 
-            return render(request, 'auth/password-reset-request.html', {'resetlinksend': resetlinksend})
+@method_decorator(redirect_logged_user, name='dispatch')
+class PasswordResetRequestView(FormView):
+    form_class = EmailForm
+    template_name = 'auth/password-reset-request.html'
 
-        else:
-            return render(request, 'auth/password-reset-request.html', {'resetlinksend': False})
-
-def password_reset_change(request, user_id, token):
-    if request.method == 'POST':
-        user = get_user_model().objects.get(pk=user_id)
-        form = SetPasswordForm(user=user, data=request.POST)
-        
-        if form.is_valid():
-            form.save()
-            return render(request, 'auth/password-reset.html', {'password_changed': True})
-        
-        return render(request, 'auth/password-reset.html', {'form': form})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        messages_list = messages.get_messages(self.request)
+        if len(messages_list):
+            for message in messages_list:
+                if message.tags == 'reset-password-link-sent success':
+                    context['reset_password_link_sent'] = True
             
-    else:
-        decoded_token = check_token(token=token)
-        if decoded_token and decoded_token['user_id'] == user_id:
-            user = get_user_model().objects.get(pk=user_id)
-            form = SetPasswordForm(user)
-            return render(request, 'auth/password-reset.html', {'form': form})
+        return context
+
+    def form_valid(self, form):
+        email = form.cleaned_data.get("email")
+        try:
+            user = get_user_model().objects.get(email=email)
+        except get_user_model().models.CustomUser.DoesNotExist:
+            user = None
+        if user is not None:
+            reset_link_sent = send_reset_password_mail(to_user=user)
+        if reset_link_sent:
+            messages.add_message(self.request, messages.SUCCESS, 'Mail z linkiem do resetu hasła został wysłany', extra_tags='reset-password-link-sent')
         else:
-            return render(request, 'auth/password-reset.html', {'token_error': True})
+            messages.add_message(self.request, messages.ERROR, 'Mail z linkiem do resetu hasła nie został wysłany', extra_tags='reset-password-link-not-sent')
+        return super().form_valid(form)
+  
+    def get_success_url(self):
+        return reverse_lazy('auth:password-reset-request')
     
+@method_decorator(redirect_logged_user, name='dispatch')
+class PasswordResetChangeView(FormView, SingleObjectMixin):
+    form_class = SetPasswordForm
+    template_name = 'auth/password-reset.html'
+    model = get_user_model()
+
+    def get_object(self, queryset=None):
+        if not hasattr(self, 'object'):
+            self.object = get_object_or_404(get_user_model(), pk=self.kwargs['pk'])
+        return self.object
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if 'token' in kwargs:
+            self.token = kwargs.get('token')
+            decoded_token = check_token(token=self.token)
+            if not(decoded_token and decoded_token['user_id'] == self.object.id):
+                messages.add_message(request, messages.ERROR, 'Token wygasł lub jest nieprawidłowy', extra_tags='token-invalid')
+        
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Hasło zostało zmienione', extra_tags='password-changed')
+        return super().form_valid(form)
     
+    def get_form_kwargs(self):
+        kwargs =  super().get_form_kwargs()
+        kwargs['user'] = self.get_object()
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        messages_list = messages.get_messages(self.request)
+        if len(messages_list):
+            for message in messages_list:
+                if message.tags == 'token-invalid error':
+                    context['token_invalid'] = True
+        else:
+            context['password_reset_change_form'] = True
+            
+        return context
+    
+    def get_success_url(self):
+        return reverse_lazy('auth:password-reset-changed')
+    
+@method_decorator(redirect_logged_user, name='dispatch')
+class PasswordChangedView(TemplateView):
+    template_name = 'auth/password-reset.html'
+
+    def dispatch(self, request, *args, **kwargs):      
+        if not len(messages.get_messages(request)):
+            raise PermissionDenied
+        
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        messages_list = messages.get_messages(self.request)
+        if len(messages_list):
+            for message in messages_list:
+                if message.tags == 'password-changed success':
+                    context['password_changed'] = True
+            
+        return context

@@ -74,7 +74,6 @@ class ConfirmationForm(forms.Form):
     confirm_code = forms.CharField(label="Confirmation Code", validators=[MinLengthValidator(6), MaxLengthValidator(6), only_int_validator])
     confirm_code.widget.attrs.update({'class': 'form-control text-center'})
 
-class VerifyEmailForm(forms.Form):
+class EmailForm(forms.Form):
     email = forms.EmailField(label=_("Email"), max_length=254)
 
-    
