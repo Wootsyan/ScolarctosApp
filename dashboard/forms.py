@@ -93,7 +93,7 @@ class SchoolsGuardianForm(Form):
         super().__init__(*args, **kwargs)
 
         self.fields['schools'].queryset = School.objects.filter(accepted=True).order_by(Lower('name'))
-        self.initial['schools'] = self.request.user.guardians.all()
+        self.initial['schools'] = self.request.user.schools.all()
 
 class TeamsAddFile(ModelForm):
     valid_extensions = [

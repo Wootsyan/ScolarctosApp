@@ -56,7 +56,7 @@ class SchoolsGuardianListView(PermissionRequiredMixin, ListView):
         return context
     
     def get_queryset(self):    
-        return self.request.user.guardians.all()
+        return self.request.user.schools.all()
     
     def has_permission(self):
         if self.request.user.user_type == CustomUser.GUARDIAN:
@@ -185,7 +185,7 @@ class SchoolsGuardianUpdateView(PermissionRequiredMixin, FormView):
         
     def form_valid(self, form):
         # Check if removed school from list is not connected with guardian's team
-        self.request.user.guardians.set(form.cleaned_data['schools'])
+        self.request.user.schools.set(form.cleaned_data['schools'])
         self.request.user.save()
         return HttpResponseRedirect(self.get_success_url())
         

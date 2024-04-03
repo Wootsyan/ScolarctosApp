@@ -1,0 +1,77 @@
+{% extends "dashboard/base.html" %}
+{% block meta_title %}{{ page_name }} | Koala{% endblock meta_title %}
+{% block page_title %}{{ page_name }}{% endblock page_title %}
+{% block breadcrumb %}
+<li><span>{{ page_name }}</span></li>
+{% endblock breadcrumb %}
+{% block content %}
+        <div class="main-content-inner">
+            <div class="row">
+                <!-- Dark table start -->
+                <div class="col-12 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-lg-6">
+                                    <h4 class="header-title">Lista zespołów bez opiekuna z Twoich szkół</h4>
+                                </div>
+                                <div class="col-lg-6 d-flex justify-content-lg-end">
+                                </div>
+                            </div>
+                            {% if teams %}
+                            <div class="data-tables datatable-dark">
+                                <table id="dataTableTeams" class="text-center">
+                                    <thead class="">
+                                        <tr>
+                                            <th class="desktop">Nazwa</th>
+                                            <th class="desktop">Szkoła</th>
+                                            <th class="desktop">Kapitan</th>
+                                            <th class="desktop">Akcja</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for team in teams %}
+                                        <tr>
+                                            <td>{{ team.name }}</td>
+                                            <td>
+                                                <span class="d-inline-block text-truncate" style="max-width: 220px;" title="{{ team.school.name }}">{{ team.school.name }}</span>
+                                            </td>
+                                            <td>
+                                                <span title="{{ team.leader.first_name }} {{ team.leader.last_name }}">{{ team.leader.email }}</span>
+                                            </td> 
+                                            <td>
+                                                <a href="#" class="btn btn-info" role="button" aria-pressed="true">
+                                                    <i class="fa fa-send-o"></i>
+                                                    Zaproś
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %} 
+                            <p class="text-danger">Brak zespołów bez opiekuna w Twoich szkołach</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Dark table end -->
+            </div>
+        </div>
+{% endblock content %}
+{% block additionalthemecss %}
+<!-- Start datatable css -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.jqueryui.min.css">
+{% endblock additionalthemecss %}
+{% block additionalthemescripts %}
+<!-- Start datatable js -->
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+<script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
+{% endblock additionalthemescripts %}

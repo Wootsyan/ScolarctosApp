@@ -27,7 +27,7 @@ class School(models.Model):
         User, 
         null=True, 
         blank=True, 
-        related_name="guardians", 
+        related_name="schools", 
         related_query_name="guardians",
         )
 
