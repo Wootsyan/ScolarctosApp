@@ -40,4 +40,5 @@ urlpatterns = [
     path('teams/<int:team_id>/file/<int:pk>/delete/', teams.TeamsFileDeleteView.as_view(), name='teams-file-delete'),
     path('invitations/available-guardians/', invitations.InvitationsAvailableGuardiansListView.as_view(), name='invitations-available-guardians-list'),
     path('invitations/available-teams/', invitations.InvitationsAvailableTeamsListView.as_view(), name='invitations-available-teams-list'),
+    path('invitations/invite/', invitations.InvitationCreateView.as_view(), name='invitations-invite'),
 ]

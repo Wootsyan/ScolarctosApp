@@ -18,40 +18,54 @@
                                 <div class="col-lg-6 d-flex justify-content-lg-end">
                                 </div>
                             </div>
-                            {% if teams %}
-                            <div class="data-tables datatable-dark">
-                                <table id="dataTableTeams" class="text-center">
-                                    <thead class="">
-                                        <tr>
-                                            <th class="desktop">Nazwa</th>
-                                            <th class="desktop">Szkoła</th>
-                                            <th class="desktop">Kapitan</th>
-                                            <th class="desktop">Akcja</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for team in teams %}
-                                        <tr>
-                                            <td>{{ team.name }}</td>
-                                            <td>
-                                                <span class="d-inline-block text-truncate" style="max-width: 220px;" title="{{ team.school.name }}">{{ team.school.name }}</span>
-                                            </td>
-                                            <td>
-                                                <span title="{{ team.leader.first_name }} {{ team.leader.last_name }}">{{ team.leader.email }}</span>
-                                            </td> 
-                                            <td>
-                                                <a href="#" class="btn btn-info" role="button" aria-pressed="true">
-                                                    <i class="fa fa-send-o"></i>
-                                                    Zaproś
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {% else %} 
-                            <p class="text-danger">Brak zespołów bez opiekuna w Twoich szkołach</p>
+                            {% if user.schools.exists %}
+                                {% if teams %}
+                                <div id="available-invitations-list" class="data-tables datatable-dark">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="inviteposturl" value="{% url "dashboard:invitations-invite" %}">
+                                    <table id="dataTableTeams" class="text-center">
+                                        <thead class="">
+                                            <tr>
+                                                <th class="desktop">Nazwa</th>
+                                                <th class="desktop">Szkoła</th>
+                                                <th class="desktop">Kapitan</th>
+                                                <th class="desktop">Akcja</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for team in teams %}
+                                            <tr>
+                                                <td>{{ team.name }}</td>
+                                                <td>
+                                                    <span class="d-inline-block text-truncate" style="max-width: 220px;" title="{{ team.school.name }}">{{ team.school.name }}</span>
+                                                </td>
+                                                <td>
+                                                    <span title="{{ team.leader.first_name }} {{ team.leader.last_name }}">{{ team.leader.email }}</span>
+                                                </td> 
+                                                <td>
+                                                    {% if team.invited %}
+                                                    <button type="button" class="btn btn-info disabled" aria-disabled="true" disabled>
+                                                        <i class="fa fa-spinner"></i>
+                                                        Zaproszony
+                                                    </button> 
+                                                    {% else %}
+                                                    <button type="button" class="btn btn-info invite" aria-pressed="true" data-recipient-id="{{ team.leader.id }}">
+                                                        <i class="fa fa-send-o"></i>
+                                                        Zaproś
+                                                    </button>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %} 
+                                <p class="text-danger">Brak zespołów bez opiekuna w Twoich szkołach</p>
+                                {% endif %}
+                            {% else %}
+                            <p class="text-danger mb-2">Nie przynależysz do żadnej ze szkół</p>
+                            <a href="{% url "dashboard:schools-guardian-edit" %}" class="btn btn-primary" role="button" aria-pressed="true">Edytuj listę szkół</a>
                             {% endif %}
                         </div>
                     </div>

@@ -14,13 +14,15 @@
                         <div class="card-body">
                             <div class="row mb-3">
                                 <div class="col-lg-6">
-                                    <h4 class="header-title">Lista opiekunów szkoły: {{ user.team_set.first.school.name }}</h4>
+                                    <h4 class="header-title">Dostępni do zaproszenia opiekunowie szkoły: {{ user.team_set.first.school.name }}</h4>
                                 </div>
                                 <div class="col-lg-6 d-flex justify-content-lg-end">
                                 </div>
                             </div>
                             {% if guardians %}
-                            <div class="data-tables datatable-dark">
+                            <div id="available-invitations-list" class="data-tables datatable-dark">
+                                {% csrf_token %}
+                                <input type="hidden" name="inviteposturl" value="{% url "dashboard:invitations-invite" %}">
                                 <table id="dataTableUsers" class="text-center">
                                     <thead class="">
                                         <tr>
@@ -37,10 +39,17 @@
                                             <td>{{ guardian.first_name }}</td>
                                             <td>{{ guardian.last_name }}</td>                                            
                                             <td>
-                                                <a href="#" class="btn btn-info" role="button" aria-pressed="true">
-                                                    <i class="fa fa-send-o"></i>
-                                                    Zaproś
-                                                </a>
+                                                {% if guardian.invited %}
+                                                    <button type="button" class="btn btn-info disabled" aria-disabled="true" disabled>
+                                                        <i class="fa fa-spinner"></i>
+                                                        Zaproszony
+                                                    </button> 
+                                                    {% else %}
+                                                    <button type="button" class="btn btn-info invite" aria-pressed="true" data-recipient-id="{{ guardian.id }}">
+                                                        <i class="fa fa-send-o"></i>
+                                                        Zaproś
+                                                    </button>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                         {% endfor %}

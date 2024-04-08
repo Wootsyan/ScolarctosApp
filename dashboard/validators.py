@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from users.models import CustomUser
 
 def validate_student_guardian(value):
-    if value not in [CustomUser.STUDENT, CustomUser.GUARDIAN]:
+    if CustomUser.objects.get(pk=value).user_type not in [CustomUser.STUDENT, CustomUser.GUARDIAN]:
         raise ValidationError(
-            ("Incorrect user type"),
+            (f"Incorrect user type {value}"),
         )

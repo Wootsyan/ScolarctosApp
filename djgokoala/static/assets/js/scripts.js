@@ -299,4 +299,35 @@
         }
     })
 
+    /* Invitation POST requests */ 
+    $('#available-invitations-list .invite').on('click', function () {
+        let url = $('input[name="inviteposturl"]').attr('value');
+        let csrfmiddlewaretoken = $('input[name="csrfmiddlewaretoken"]').attr('value');
+        let datarecipientid = $(this).attr('data-recipient-id');
+        
+        $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "json",
+            data: JSON.stringify({ id: datarecipientid, }),
+            headers: {
+                "X-CSRFToken": csrfmiddlewaretoken,
+            },
+            success: (data) => {
+                let disabledButton = $('<button>');
+                disabledButton.attr('aria-disabled', 'true').attr('disabled', 'disabled').attr('type', 'button');
+                disabledButton.addClass('btn btn-info disabled');
+                disabledButton.text(' ' + data.message);
+                let buttonIcon = $('<i>');
+                buttonIcon.addClass('fa fa-spinner');
+                buttonIcon.prependTo(disabledButton);
+                $(this).after(disabledButton);
+                $(this).remove();
+              },
+            error: (error) => {
+                console.log(error);
+            }
+        });
+    })
+
 })(jQuery);

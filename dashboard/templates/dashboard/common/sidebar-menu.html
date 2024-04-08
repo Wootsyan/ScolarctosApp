@@ -57,7 +57,7 @@
                                 <li><a class="{% if request.resolver_match.url_name == "teams-new" %}active{% endif %}" href="{% url "dashboard:teams-new" %}">Utwórz zespół</a></li>
                                 {% endif %}
                             {% endwith %}
-                            {% if user.schools.exists %}
+                            {% if user.user_type == user.GUARDIAN %}
                             <li><a class="{% if request.resolver_match.url_name == "invitations-available-teams-list" %}active{% endif %}" href="{% url "dashboard:invitations-available-teams-list" %}">Zaproś zespół</a></li>
                             {% endif %}
                             {% if perms.dashboard.view_team %}

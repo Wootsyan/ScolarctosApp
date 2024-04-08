@@ -23,3 +23,7 @@
 .custom-file-label::after{
     content: none;
 }
+
+button.disabled{
+    cursor: default;
+}

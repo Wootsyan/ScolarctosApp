@@ -7,7 +7,7 @@ from django.views.generic.base import TemplateView
 ### Main Views
 '''
 @method_decorator(login_required, name='dispatch')
-class IndexView(TemplateView):
+class  IndexView(TemplateView):
         template_name = "dashboard/index.html"
 
 '''

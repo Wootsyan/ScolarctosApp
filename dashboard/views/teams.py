@@ -284,9 +284,14 @@ class TeamsLeaderDisconnectView(PermissionRequiredMixin, DeleteView):
     
     def form_valid(self, form):
         self.team = self.get_object()
+        # Clear user gdpr
         self.team.leader.gdpr.gdpr_consent = False
         self.team.leader.gdpr.parental_consent = False
         self.team.leader.gdpr.save()
+        # Clear user invitations
+        self.team.leader.sender.all().delete()
+        self.team.leader.recipient.all().delete()
+        # Disconnect user from team
         self.team.leader = None
         self.team.save()
         return HttpResponseRedirect(self.get_success_url())
