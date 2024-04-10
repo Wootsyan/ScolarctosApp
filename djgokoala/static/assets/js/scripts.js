@@ -300,10 +300,10 @@
     })
 
     /* Invitation POST requests */ 
-    $('#available-invitations-list .invite').on('click', function () {
+    function inviteNew(thisObj) { 
         let url = $('input[name="inviteposturl"]').attr('value');
         let csrfmiddlewaretoken = $('input[name="csrfmiddlewaretoken"]').attr('value');
-        let datarecipientid = $(this).attr('data-recipient-id');
+        let datarecipientid = thisObj.attr('data-recipient-id');
         
         $.ajax({
             type: "POST",
@@ -316,18 +316,69 @@
             success: (data) => {
                 let disabledButton = $('<button>');
                 disabledButton.attr('aria-disabled', 'true').attr('disabled', 'disabled').attr('type', 'button');
-                disabledButton.addClass('btn btn-info disabled');
-                disabledButton.text(' ' + data.message);
-                let buttonIcon = $('<i>');
-                buttonIcon.addClass('fa fa-spinner');
-                buttonIcon.prependTo(disabledButton);
-                $(this).after(disabledButton);
-                $(this).remove();
+                disabledButton.addClass('btn btn-info disabled mr-1');
+                disabledButton.text(' ' + data.messageInvite);
+                let buttonDisabledIcon = $('<i>');
+                buttonDisabledIcon.addClass('fa fa-spinner');
+                buttonDisabledIcon.prependTo(disabledButton);
+                thisObj.after(disabledButton);
+                thisObj.remove();
+
+                let activeButton = $('<button>');
+                activeButton.attr('aria-pressed', 'true').attr('type', 'button').attr('data-recipient-id', data.dataRecipientID);
+                activeButton.addClass('btn btn-danger invite-cancel');
+                activeButton.text(' ' + data.messageCancel);
+                activeButton.on('click', function () { inviteCancel($(this)); });
+                let buttonActiveIcon = $('<i>');
+                buttonActiveIcon.addClass('fa fa-close');
+                buttonActiveIcon.prependTo(activeButton);
+                disabledButton.after(activeButton);
               },
             error: (error) => {
                 console.log(error);
             }
         });
-    })
+    }
+
+    $('#available-invitations-list .invite').on('click', function () {
+        inviteNew($(this));
+     });
+
+    function inviteCancel(thisObj) { 
+        let url = $('input[name="invitecanceldeleteurl"]').attr('value');
+        let csrfmiddlewaretoken = $('input[name="csrfmiddlewaretoken"]').attr('value');
+        let datarecipientid = thisObj.attr('data-recipient-id');
+        
+        $.ajax({
+            type: "DELETE",
+            url: url,
+            dataType: "json",
+            data: JSON.stringify({ id: datarecipientid, }), 
+            headers: {
+                "X-CSRFToken": csrfmiddlewaretoken,
+            },
+            success: (data) => {
+                let activeButton = $('<button>');
+                activeButton.attr('aria-pressed', 'true').attr('type', 'button').attr('data-recipient-id', data.dataRecipientID);
+                activeButton.addClass('btn btn-info invite');
+                activeButton.text(' ' + data.message);
+                activeButton.on('click', function () { inviteNew($(this)); });
+                let buttonActiveIcon = $('<i>');
+                buttonActiveIcon.addClass('fa fa-send-o');
+                buttonActiveIcon.prependTo(activeButton);
+                thisObj.after(activeButton);
+                thisObj.prev().remove();
+                thisObj.remove();
+              },
+            error: (error) => {
+                console.log(error);
+            }
+        });
+    }
+    
+    /* Invitation DELETE requests */ 
+    $('#available-invitations-list .invite-cancel').on('click', function () {
+        inviteCancel($(this));
+     });
 
 })(jQuery);

@@ -41,4 +41,5 @@ urlpatterns = [
     path('invitations/available-guardians/', invitations.InvitationsAvailableGuardiansListView.as_view(), name='invitations-available-guardians-list'),
     path('invitations/available-teams/', invitations.InvitationsAvailableTeamsListView.as_view(), name='invitations-available-teams-list'),
     path('invitations/invite/', invitations.InvitationCreateView.as_view(), name='invitations-invite'),
+    path('invitations/invite-cancel/', invitations.InvitationCancelView.as_view(), name='invitations-invite-cancel'),
 ]

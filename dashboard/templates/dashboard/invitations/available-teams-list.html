@@ -23,6 +23,7 @@
                                 <div id="available-invitations-list" class="data-tables datatable-dark">
                                     {% csrf_token %}
                                     <input type="hidden" name="inviteposturl" value="{% url "dashboard:invitations-invite" %}">
+                                    <input type="hidden" name="invitecanceldeleteurl" value="{% url "dashboard:invitations-invite-cancel" %}">
                                     <table id="dataTableTeams" class="text-center">
                                         <thead class="">
                                             <tr>
@@ -44,10 +45,14 @@
                                                 </td> 
                                                 <td>
                                                     {% if team.invited %}
-                                                    <button type="button" class="btn btn-info disabled" aria-disabled="true" disabled>
+                                                    <button type="button" class="btn btn-info disabled mr-1" aria-disabled="true" disabled>
                                                         <i class="fa fa-spinner"></i>
                                                         Zaproszony
                                                     </button> 
+                                                    <button type="button" class="btn btn-danger invite-cancel" aria-pressed="true" data-recipient-id="{{ team.leader.id }}">
+                                                        <i class="fa fa-close"></i>
+                                                        Anuluj
+                                                    </button>
                                                     {% else %}
                                                     <button type="button" class="btn btn-info invite" aria-pressed="true" data-recipient-id="{{ team.leader.id }}">
                                                         <i class="fa fa-send-o"></i>

@@ -6,6 +6,8 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, HttpRes
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.list import ListView
 from django.views.generic import CreateView
+from django.views import View
+
 
 from users.models import CustomUser
 from dashboard.models import Team, Invitation
@@ -100,7 +102,11 @@ class InvitationCreateView(PermissionRequiredMixin, CreateView):
                 if (not Invitation.accepted_none_objects.filter(sender=form.cleaned_data.get('sender')).filter(recipient=form.cleaned_data.get('recipient')).exists() and
                     not Invitation.accepted_none_objects.filter(sender=form.cleaned_data.get('recipient')).filter(recipient=form.cleaned_data.get('sender')).exists()):
                     form.save()
-                    return JsonResponse({'message': 'Zaproszony'})
+                    return JsonResponse({
+                        'messageInvite': 'Zaproszony', 
+                        'messageCancel': 'Anuluj',
+                        'dataRecipientID': recipient_id,
+                    })
         
         return HttpResponseBadRequest('Invalid request')
     
@@ -109,5 +115,27 @@ class InvitationCreateView(PermissionRequiredMixin, CreateView):
         if user.user_type == CustomUser.GUARDIAN and user.schools.exists():
             return True
         if user.user_type == CustomUser.STUDENT and user.team_set.exists() and user.team_set.first().team_guardian is None:
+            return True
+        return False
+    
+@method_decorator(login_required, name='dispatch')
+class InvitationCancelView(PermissionRequiredMixin, View):
+    http_method_names = ['delete']
+    model = Invitation
+
+    def delete(self, request, *args, **kwargs):
+        delete_data = json.loads(request.body)
+        recipient_id = delete_data.get('id')
+        if recipient_id and CustomUser.objects.filter(pk=recipient_id).exists():
+            try:
+                obj = self.model.accepted_none_objects.get(sender=request.user.id, recipient=recipient_id)
+                obj.delete()
+                return JsonResponse({'message': 'Zaproś', 'dataRecipientID': recipient_id})
+            except self.model.DoesNotExist:
+                return HttpResponseBadRequest('Invalid request')
+    
+    def has_permission(self):
+        user = self.request.user
+        if user.sender.filter(accepted=None).exists():
             return True
         return False
