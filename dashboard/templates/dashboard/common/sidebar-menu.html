@@ -60,6 +60,9 @@
                             {% if user.user_type == user.GUARDIAN %}
                             <li><a class="{% if request.resolver_match.url_name == "invitations-available-teams-list" %}active{% endif %}" href="{% url "dashboard:invitations-available-teams-list" %}">Zaproś zespół</a></li>
                             {% endif %}
+                            {% if perms.dashboard.view_invitation %}
+                                <li class="{% if request.resolver_match.url_name == "invitations-list" %}active{% endif %}"><a href="{% url "dashboard:invitations-list" %}">Zaproszenia</a></li>
+                            {% endif %}
                             {% if perms.dashboard.view_team %}
                                 <li class="{% if request.resolver_match.url_name == "teams-list" %}active{% endif %}"><a href="{% url "dashboard:teams-list" %}">Wszystkie</a></li>
                             {% endif %}

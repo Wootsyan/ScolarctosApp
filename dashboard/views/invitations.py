@@ -139,3 +139,18 @@ class InvitationCancelView(PermissionRequiredMixin, View):
         if user.sender.filter(accepted=None).exists():
             return True
         return False
+    
+class InvitationListView(PermissionRequiredMixin, ListView):
+    context_object_name = 'invitations'
+    template_name = 'dashboard/invitations/list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_name'] = 'Aktywne zaproszenia'
+        return context
+
+    def get_queryset(self):
+        return self.request.user.recipient.filter(accepted=None)
+    
+    def has_permission(self):
+        return self.request.user.has_perm('dashboard.view_invitation')

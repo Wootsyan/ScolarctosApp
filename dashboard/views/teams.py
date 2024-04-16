@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView, FormMixin
@@ -152,6 +152,17 @@ class TeamsDeleteView(PermissionRequiredMixin, DeleteView):
         context = super(TeamsDeleteView, self).get_context_data(**kwargs)
         context['page_name'] = f"Zespół: {context['team'].name}"
         return context
+    
+    def form_valid(self, form):
+        self.team = self.get_object()
+        # Clear user gdpr
+        self.team.leader.gdpr.gdpr_consent = False
+        self.team.leader.gdpr.parental_consent = False
+        self.team.leader.gdpr.save()
+        # Clear user invitations
+        self.team.leader.sender.all().delete()
+        self.team.leader.recipient.all().delete()
+        return super().form_valid(form)
     
     def has_permission(self):
         self.object = self.get_object()
