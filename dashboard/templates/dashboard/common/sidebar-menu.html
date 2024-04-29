@@ -51,17 +51,25 @@
                                 {% if team %}
                                 <li><a class="{% if request.resolver_match.url_name == "teams-detail" %}active{% endif %}" href="{% url "dashboard:teams-detail" team.id %}">Mój zespół</a></li>
                                     {% if not team.team_guardian %}
-                                    <li><a class="{% if request.resolver_match.url_name == "invitations-available-guardians-list" %}active{% endif %}" href="{% url "dashboard:invitations-available-guardians-list" %}">Zaproś opiekuna</a></li>
+                                    <li><a href="#" aria-expanded="true">Zaproszenia</a>
+                                        <ul class="collapse">
+                                            <li class="{% if request.resolver_match.url_name == "invitations-list" %}active{% endif %}"><a href="{% url "dashboard:invitations-list" %}">Otrzymane</a></li>
+                                            <li><a class="{% if request.resolver_match.url_name == "invitations-available-guardians-list" %}active{% endif %}" href="{% url "dashboard:invitations-available-guardians-list" %}">Zaproś opiekuna</a></li>
+                                        </ul>
+                                    </li>
                                     {% endif %}
                                 {% elif perms.dashboard.add_team %}
                                 <li><a class="{% if request.resolver_match.url_name == "teams-new" %}active{% endif %}" href="{% url "dashboard:teams-new" %}">Utwórz zespół</a></li>
                                 {% endif %}
+
                             {% endwith %}
                             {% if user.user_type == user.GUARDIAN %}
-                            <li><a class="{% if request.resolver_match.url_name == "invitations-available-teams-list" %}active{% endif %}" href="{% url "dashboard:invitations-available-teams-list" %}">Zaproś zespół</a></li>
-                            {% endif %}
-                            {% if perms.dashboard.view_invitation %}
-                                <li class="{% if request.resolver_match.url_name == "invitations-list" %}active{% endif %}"><a href="{% url "dashboard:invitations-list" %}">Zaproszenia</a></li>
+                            <li><a href="#" aria-expanded="true">Zaproszenia</a>
+                                <ul class="collapse">
+                                    <li class="{% if request.resolver_match.url_name == "invitations-list" %}active{% endif %}"><a href="{% url "dashboard:invitations-list" %}">Otrzymane</a></li>
+                                    <li class="{% if request.resolver_match.url_name == "invitations-available-teams-list" %}active{% endif %}"><a href="{% url "dashboard:invitations-available-teams-list" %}">Zaproś zespół</a></li>
+                                </ul>
+                            </li>
                             {% endif %}
                             {% if perms.dashboard.view_team %}
                                 <li class="{% if request.resolver_match.url_name == "teams-list" %}active{% endif %}"><a href="{% url "dashboard:teams-list" %}">Wszystkie</a></li>

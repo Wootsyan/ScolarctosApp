@@ -43,10 +43,10 @@
                                                 <td>{{ invitation.sender.first_name }}</td> 
                                                 <td>{{ invitation.sender.last_name }}</td>
                                                 <td>
-                                                    <a href="#" class="btn btn-success" role="button" aria-pressed="true">
+                                                    <a href="{% url "dashboard:invitations-edit-accept" invitation.id %}" class="btn btn-success" role="button" aria-pressed="true">
                                                         <i class="fa fa-check-circle-o"></i>
                                                     </a>
-                                                    <a href="#" class="btn btn-danger" role="button" aria-pressed="true">
+                                                    <a href="{% url "dashboard:invitations-edit-not-accept" invitation.id %}" class="btn btn-danger" role="button" aria-pressed="true">
                                                         <i class="fa fa-close"></i>
                                                     </a>
                                                 </td>
@@ -61,10 +61,10 @@
                                                 <td>{{ sender_team.school.name }}</td>
                                                 {% endwith %}
                                                 <td>
-                                                    <a href="#" class="btn btn-success" role="button" aria-pressed="true">
+                                                    <a href="{% url "dashboard:invitations-edit-accept" invitation.id %}" class="btn btn-success" role="button" aria-pressed="true">
                                                         <i class="fa fa-check-circle-o"></i>
                                                     </a>
-                                                    <a href="#" class="btn btn-danger" role="button" aria-pressed="true">
+                                                    <a href="{% url "dashboard:invitations-edit-not-accept" invitation.id %}" class="btn btn-danger" role="button" aria-pressed="true">
                                                         <i class="fa fa-close"></i>
                                                     </a>
                                                 </td>

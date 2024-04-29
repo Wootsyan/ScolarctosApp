@@ -40,6 +40,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
     
+    def is_student(self):
+        return self.user_type == self.STUDENT
+    
+    def is_guardian(self):
+        return self.user_type == self.GUARDIAN
+    
     class Meta:
         verbose_name = _("user")
         verbose_name_plural = _("users")

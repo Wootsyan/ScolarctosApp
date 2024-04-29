@@ -18,3 +18,19 @@ class Invitation(models.Model):
 
     def __str__(self):
         return f'From: {self.sender.email} | To: {self.recipient.email} | Accepted: {self.accepted}'
+    
+    def get_guardian(self):
+        if self.sender.is_guardian():
+            return self.sender
+        elif self.recipient.is_guardian():
+            return self.recipient
+    
+    def get_student(self):
+        if self.sender.is_student():
+            return self.sender
+        elif self.recipient.is_student():
+            return self.recipient
+
+    def get_team(self):
+        leader = self.get_student()
+        return leader.team_set.first()

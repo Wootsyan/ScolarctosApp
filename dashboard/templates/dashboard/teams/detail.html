@@ -46,7 +46,7 @@
                                                 <th scope="row">Opiekun:</th>
                                                 <td>
                                                     {% if team.team_guardian %}
-                                                    <a href="{% url "dashboard:users-detail" team.team_guardian.guardian %}">{{ team.team_guardian.guardian.email }}</a>
+                                                    <a href="{% url "dashboard:users-detail" team.team_guardian.guardian.id %}">{{ team.team_guardian.guardian.email }}</a>
                                                     {% else %}
                                                     <span class="text-danger">Brak</span>
                                                     {% endif %}
