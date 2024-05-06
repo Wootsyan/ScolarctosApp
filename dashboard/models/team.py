@@ -13,7 +13,7 @@ class Team(models.Model):
     name = models.CharField(max_length=63, unique=True)
     description = models.TextField(blank=True)
     leader = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    team_guardian = models.ForeignKey(TeamGuardian, on_delete=models.CASCADE, null=True, blank=True)
+    team_guardian = models.ForeignKey(TeamGuardian, on_delete=models.SET_NULL, null=True, blank=True)
     team_members = models.ManyToManyField(
         User, 
         null=True, 

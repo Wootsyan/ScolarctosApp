@@ -1,4 +1,4 @@
-from django.forms import Form, ModelForm, CheckboxSelectMultiple, Select, BooleanField
+from django.forms import Form, ModelForm, CheckboxSelectMultiple, Select, BooleanField, ChoiceField
 from django.db.models.functions import Lower
 from django.core.validators import FileExtensionValidator 
 
@@ -28,6 +28,22 @@ class CreateTeamForm(ModelForm):
             'description',
             'editable'
         ]
+
+class UpdateTeamForm(CreateTeamForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance.team_guardian:
+            self.fields['school'].disabled = True
+            GUARDIAN_CHOICES = (
+                (0, f'{self.instance.team_guardian.guardian.first_name} {self.instance.team_guardian.guardian.last_name}'),
+                (1, 'Brak'),
+            )
+
+            self.fields['guardian'] = ChoiceField(choices=GUARDIAN_CHOICES)
+            self.fields['guardian'].widget.attrs['class'] = 'form-control'
+
+
 
 class CreateTeamMemberForm(ModelForm):
     gdpr_consent = BooleanField(required=False)

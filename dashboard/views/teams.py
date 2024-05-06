@@ -9,7 +9,7 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from dashboard.utils import generate_team_member_email
 from dashboard.models import Team
-from dashboard.forms import CreateTeamForm, CreateTeamMemberForm, UpdateTeamMemberForm, UpdateTeamLeaderForm, ConnectTeamLeaderForm, TeamsAddFile
+from dashboard.forms import CreateTeamForm, CreateTeamMemberForm, UpdateTeamMemberForm, UpdateTeamLeaderForm, ConnectTeamLeaderForm, TeamsAddFile, UpdateTeamForm
 from users.models import CustomUser
 from gdpr.models import Gdpr
 from files.models import File
@@ -64,8 +64,10 @@ class TeamsDetailView(PermissionRequiredMixin, FormMixin, DetailView):
     def has_permission(self):
         if self.get_object().leader == self.request.user:
             return True
-        else:
-            return self.request.user.has_perm('dashboard.view_team')
+        elif self.get_object().team_guardian.guardian == self.request.user:
+            return True
+        
+        return self.request.user.has_perm('dashboard.view_team')
         
     def get_success_url(self):
         kwargs = {'pk': self.object.id}
@@ -112,7 +114,7 @@ class TeamsUpdateView(PermissionRequiredMixin, UpdateView):
     model = Team
     context_object_name = 'team'
     template_name = 'dashboard/teams/edit.html'
-    form_class = CreateTeamForm
+    form_class = UpdateTeamForm
 
     def get_context_data(self, **kwargs):
         context = super(TeamsUpdateView, self).get_context_data(**kwargs)
@@ -127,10 +129,17 @@ class TeamsUpdateView(PermissionRequiredMixin, UpdateView):
             return self.request.user.has_perm('dashboard.change_team')
         
     def form_valid(self, form):
+        if 'guardian' in form.cleaned_data:
+            disconnect_guardian = bool(int(form.cleaned_data['guardian']))
+        else:
+            disconnect_guardian = False
         self.object = form.save()
+        #Hidden editable field is default False
         if self.request.user == self.object.leader:
             self.object.editable = True
         self.object.save()
+        if disconnect_guardian:
+            self.object.team_guardian.delete()
         return HttpResponseRedirect(self.get_success_url())
         
     def get_success_url(self):

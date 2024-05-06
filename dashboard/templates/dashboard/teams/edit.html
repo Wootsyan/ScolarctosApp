@@ -31,9 +31,22 @@
                                                 <label for="{{ form.school.id_for_label }}" class="col-form-label">Szkoła</label>
                                                 {{ form.school }}
                                                 <div class="text-danger">{{ form.school.errors }}</div>
+                                                <div class="text-danger">
+                                                    {% if team.team_guardian %}Zmiana szkoły jest zablokowana gdy zespół posiada opiekuna. Odłącz opiekuna w celu zmiany szkoły.{% endif %}
+                                                </div>
                                                 <div class="text-info">W przypadku braku Twojej szkoły na liście, pozostaw pole puste i zgłoś swoją szkolę przez formularz: <a href="{% url "dashboard:schools-new" %}">dodaj swoją szkołę</a></div>
                                             </div>
                                         </div>
+                                        {% if form.guardian %}
+                                        <div class="form-row">
+                                            <div class="col-md-12 mb-3">
+                                                <label for="{{ form.guardian.id_for_label }}" class="col-form-label">Opiekun</label>
+                                                {{ form.guardian }}
+                                                <div class="text-danger">{{ form.guardian.errors }}</div>
+                                                <div class="text-info">W celu odłączenia opiekuna zmień opcję na: Brak</div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
                                         <div class="form-row">
                                             <div class="col-md-12 mb-3">
                                                 <label for="{{ form.description.id_for_label }}" class="col-form-label">Opis</label>

@@ -58,7 +58,7 @@ class InvitationsAvailableTeamsListView(PermissionRequiredMixin, ListView):
         # Find all teams connected to same school as guardian's schools
         # Team can connect only one guardian
         guardian_schools = self.guardian.schools.all()
-        guardian_received_invitations = self.guardian.recipient.all()
+        guardian_received_invitations = self.guardian.recipient.filter(accepted=None)
         teams = Team.objects.filter(
             school__in=guardian_schools, 
             team_guardian__isnull=True, 
@@ -199,8 +199,7 @@ class InvitationEditView(PermissionRequiredMixin, UpdateView):
                 return reverse_lazy('dashboard:teams-detail', kwargs={'pk': self.request.user.team_set.first().id})
             
             if self.request.user.is_guardian():
-                #TODO change url to "my teams"
-                return reverse_lazy('dashboard:index')
+                return reverse_lazy('dashboard:teams-guardian-list')
             
         if '_not-accept' in self.request.POST:
             return reverse_lazy('dashboard:invitations-list')
