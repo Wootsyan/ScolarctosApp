@@ -414,3 +414,21 @@ class TeamsFileDeleteView(PermissionRequiredMixin, DeleteView):
     def get_success_url(self, team):
         kwargs = {'pk': team.id}
         return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
+    
+
+@method_decorator(login_required, name='dispatch')
+class TeamsGuardianView(PermissionRequiredMixin, ListView):
+    # model = Team
+    context_object_name = 'teams'
+    template_name = 'dashboard/teams/guardian/list.html'
+
+    def get_queryset(self):
+        return Team.objects.filter(team_guardian__guardian=self.request.user)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_name'] = 'Moje zespoły'
+        return context
+    
+    def has_permission(self):
+        return self.request.user.is_guardian()

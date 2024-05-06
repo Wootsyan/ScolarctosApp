@@ -64,6 +64,7 @@
 
                             {% endwith %}
                             {% if user.user_type == user.GUARDIAN %}
+                            <li><a class="{% if request.resolver_match.url_name == "teams-guardian-list" %}active{% endif %}" href="{% url "dashboard:teams-guardian-list" %}">Moje zespoły</a></li>
                             <li><a href="#" aria-expanded="true">Zaproszenia</a>
                                 <ul class="collapse">
                                     <li class="{% if request.resolver_match.url_name == "invitations-list" %}active{% endif %}"><a href="{% url "dashboard:invitations-list" %}">Otrzymane</a></li>
