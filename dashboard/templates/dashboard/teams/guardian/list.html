@@ -68,7 +68,7 @@
                                                     <a href="{% url "dashboard:teams-detail" team.id %}" class="btn btn-info" role="button" aria-pressed="true">
                                                         <i class="ti-info"></i>
                                                     </a>
-                                                    <a href="#" class="btn btn-danger" role="button" aria-pressed="true">
+                                                    <a href="{% url "dashboard:teams-guardian-disconnect" team.team_guardian.id %}" class="btn btn-danger" role="button" aria-pressed="true">
                                                         <i class="fa fa-close"></i>
                                                     </a>
                                                 </div>

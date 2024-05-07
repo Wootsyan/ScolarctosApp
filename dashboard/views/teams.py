@@ -8,7 +8,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from dashboard.utils import generate_team_member_email
-from dashboard.models import Team
+from dashboard.models import Team, TeamGuardian
 from dashboard.forms import CreateTeamForm, CreateTeamMemberForm, UpdateTeamMemberForm, UpdateTeamLeaderForm, ConnectTeamLeaderForm, TeamsAddFile, UpdateTeamForm
 from users.models import CustomUser
 from gdpr.models import Gdpr
@@ -427,7 +427,6 @@ class TeamsFileDeleteView(PermissionRequiredMixin, DeleteView):
 
 @method_decorator(login_required, name='dispatch')
 class TeamsGuardianView(PermissionRequiredMixin, ListView):
-    # model = Team
     context_object_name = 'teams'
     template_name = 'dashboard/teams/guardian/list.html'
 
@@ -441,3 +440,20 @@ class TeamsGuardianView(PermissionRequiredMixin, ListView):
     
     def has_permission(self):
         return self.request.user.is_guardian()
+    
+@method_decorator(login_required, name='dispatch')
+class TeamsGuardianDisconnectView(PermissionRequiredMixin, DeleteView):
+    model = TeamGuardian
+    context_object_name = 'team_guardian'
+    template_name = 'dashboard/teams/guardian/delete.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_name'] = f"Odłączanie od zespołu"
+        return context
+
+    def has_permission(self):
+        return self.get_object().guardian == self.request.user
+    
+    def get_success_url(self):
+        return reverse_lazy('dashboard:teams-guardian-list')
