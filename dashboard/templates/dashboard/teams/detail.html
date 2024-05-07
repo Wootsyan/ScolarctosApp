@@ -128,7 +128,7 @@
                                 <p class="font-weight-bold">Limit: {{ team.files.count }}/{{ team.MAX_FILES }}</p>
                             </div>
                             {% if team.files.count < team.MAX_FILES %}
-                                {% if perms.dashboard.change_team or team.leader == user and team.editable %}
+                                {% if team.leader == user and team.editable %}
                                 <div class="mt-3 text-center">
                                     <form method="post" enctype="multipart/form-data">
                                         {% csrf_token %}
@@ -150,6 +150,75 @@
                                         </div>
                                     </form>
                                 </div>
+                                {% endif %}
+                            {% endif %}
+                            {% if team.team_guardian %}
+                            <div id="accordion3" class="according accordion-s3 mt-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a class="card-link" data-toggle="collapse" href="#accordion32" aria-expanded="true">Potwierdzenie opiekuna</a>
+                                    </div>
+                                    <div id="accordion32" class="collapse show" data-parent="#accordion3">
+                                        <div class="card-body">
+                                            {% if team.team_guardian.confirmation_file %}
+                                                {% with file=team.team_guardian.confirmation_file %}
+                                                <div class="row">
+                                                    <div class="col-lg-1">
+                                                        {% if 'pdf' in file.name %}
+                                                        <i class="fa fa-file-pdf-o"></i>
+                                                        {% else %}
+                                                        <i class="fa fa-file-image-o"></i>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="col-lg-10">
+                                                        <a href="/{{ file.path }}" title="{{ file.name }}" target="_blank">{{ file.name }}</a>
+                                                    </div>
+                                                    <div class="col-lg-1">
+                                                        {% if perms.dashboard.delete_team or team.team_guardian.guardian == user and team.editable %}
+                                                        <a href="{% url "dashboard:teams-file-delete" team.id file.id %}" title="Usuń"><i class="fa fa-trash-o text-danger"></i></a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                {% endwith %}
+                                            {% else %}
+                                            <div class="text-info text-center">Brak dołączonych plików</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-center">
+                                <p class="font-weight-bold">Limit: {% if team.team_guardian.confirmation_file %}1{% else %}0{% endif %}/1</p>
+                            </div>
+                            {% if team.team_guardian.guardian == user and not team.editable %}
+                            <div class="mt-3 text-center">
+                                <div class="text-info">Organizatorzy zablokowali możliwość edycji zespołu oraz dodawania i usuwania plików. Skontaktuj się z nimi, jeśli z jakiegoś powodu musisz wprowadzić zmiany w zespole.</div>
+                            </div>
+                            {% endif %}
+                                {% if not team.team_guardian.confirmation_file %}
+                                    {% if team.team_guardian.guardian == user and team.editable %}
+                                    <div class="mt-3 text-center">
+                                        <form method="post" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <div class="form-row">
+                                                <div class="col-md-12 mb-3">
+                                                    <div class="input-group">
+                                                        <div class="custom-file">
+                                                            {{ form.path }}
+                                                            <label for="{{ form.path.id_for_label }}" class="custom-file-label">
+                                                                Wybierz plik {% if form.valid_extensions %}({{ form.valid_extensions|join:", " }}){% endif %}
+                                                            </label>
+                                                        </div>
+                                                        <div class="input-group-append">
+                                                            <button type="submit" class="btn btn-outline-primary" type="button">Prześlij</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-danger">{{ form.path.errors }}</div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    {% endif %}
                                 {% endif %}
                             {% endif %}
                         </div>

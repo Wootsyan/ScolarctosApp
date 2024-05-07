@@ -46,8 +46,13 @@ class TeamsDetailView(PermissionRequiredMixin, FormMixin, DetailView):
         # First create instance of File and add to Team for getting Team instance for upload_to in FileField
         uploaded_file = File.objects.create()
         self.team = self.get_object()
-        self.team.files.add(uploaded_file)
-        self.team.save()
+        if self.request.user.is_student():
+            self.team.files.add(uploaded_file)
+            self.team.save()
+        elif self.request.user.is_guardian():
+            self.team.team_guardian.confirmation_file = uploaded_file
+            self.team.team_guardian.save()
+            
         uploaded_file.path = form.cleaned_data['path']
         uploaded_file.name = uploaded_file.path.name.split('/')[-1]
         uploaded_file.save()
@@ -62,9 +67,10 @@ class TeamsDetailView(PermissionRequiredMixin, FormMixin, DetailView):
             return self.form_invalid(form)
     
     def has_permission(self):
-        if self.get_object().leader == self.request.user:
+        team = self.get_object()
+        if team.leader == self.request.user:
             return True
-        elif self.get_object().team_guardian.guardian == self.request.user:
+        elif team.team_guardian is not None and team.team_guardian.guardian == self.request.user:
             return True
         
         return self.request.user.has_perm('dashboard.view_team')
@@ -401,21 +407,37 @@ class TeamsFileDeleteView(PermissionRequiredMixin, DeleteView):
     context_object_name = 'file'
     template_name = 'dashboard/teams/files/delete.html'
 
+    def get_team(self):
+        file = self.get_object()
+        if file.teams.exists():
+           return file.teams.first()
+        elif file.teamguardian_set.exists() and file.teamguardian_set.first().team_set.exists():
+            return file.teamguardian_set.first().team_set.first()
+        return None
+    
+    def dispatch(self, request, *args, **kwargs):
+        self.get_team()
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_name'] = f"Usuwanie pliku: {context['file'].name}"
-        context['team'] = self.get_object().teams.first()
+        context['team'] = self.get_team()
         return context
     
     def form_valid(self, form):
-        self.file = self.get_object()
-        self.team = self.file.teams.first()
-        self.file.delete()
-        return HttpResponseRedirect(self.get_success_url(self.team))
+        file = self.get_object()
+        team = self.get_team()
+        file.delete()
+        return HttpResponseRedirect(self.get_success_url(team))
     
     def has_permission(self):
-        self.team = self.get_object().teams.first()
-        if self.request.user == self.team.leader and self.team.editable:
+        file = self.get_object()
+        team = self.get_team()
+        #Check is file from student or from guardian
+        if file.teams.exists() and self.request.user == team.leader and team.editable:
+            return True
+        elif file.teamguardian_set.exists() and self.request.user == team.team_guardian.guardian and team.editable:
             return True
         else:
             return self.request.user.has_perm('dashboard.change_team')
