@@ -53,6 +53,16 @@
                                                 </td>
                                             </tr>
                                             <tr>
+                                                <th scope="row">Potwierdzenie opiekuna:</th>
+                                                <td>
+                                                    {% if team.team_guardian and team.team_guardian.confirmation %}
+                                                    <i title="Tak" class="fa fa-circle text-success"></i>
+                                                    {% else %}
+                                                    <i title="Nie" class="fa fa-circle text-danger"></i>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
                                                 <th scope="row">Zatwierdzony:</th>
                                                 <td>
                                                     {% if not team.editable %}

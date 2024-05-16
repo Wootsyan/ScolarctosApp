@@ -1,7 +1,6 @@
 from django.forms import Form, ModelForm, CheckboxSelectMultiple, Select, BooleanField, ChoiceField
 from django.db.models.functions import Lower
 from django.core.validators import FileExtensionValidator 
-
 from dashboard.models import Team, School
 from dashboard.fields import SchoolChoiceField, SchoolGuardianMultipleChoiceField, TeamLeaderChoiceField
 from users.models import CustomUser
@@ -29,21 +28,26 @@ class CreateTeamForm(ModelForm):
             'editable'
         ]
 
+
 class UpdateTeamForm(CreateTeamForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        team = self.instance
 
-        if self.instance.team_guardian:
+        if team.team_guardian:
             self.fields['school'].disabled = True
             GUARDIAN_CHOICES = (
-                (0, f'{self.instance.team_guardian.guardian.first_name} {self.instance.team_guardian.guardian.last_name}'),
+                (0, f'{team.team_guardian.guardian.first_name} {team.team_guardian.guardian.last_name}'),
                 (1, 'Brak'),
             )
 
             self.fields['guardian'] = ChoiceField(choices=GUARDIAN_CHOICES)
             self.fields['guardian'].widget.attrs['class'] = 'form-control'
 
-
+            self.fields['guardian_confirmation'] = BooleanField(required=False)
+            self.fields['guardian_confirmation'].widget.attrs['class'] = 'custom-control-input'
+            self.initial['guardian_confirmation'] = team.team_guardian.confirmation 
+            
 
 class CreateTeamMemberForm(ModelForm):
     gdpr_consent = BooleanField(required=False)
@@ -65,6 +69,7 @@ class CreateTeamMemberForm(ModelForm):
             'last_name',
         ]
 
+
 class UpdateTeamMemberForm(CreateTeamMemberForm):
 
     def __init__(self, *args, **kwargs):
@@ -73,6 +78,7 @@ class UpdateTeamMemberForm(CreateTeamMemberForm):
         self.initial['gdpr_consent'] = self.instance.gdpr.gdpr_consent
         self.initial['parental_consent'] = self.instance.gdpr.parental_consent
 
+
 class UpdateTeamLeaderForm(UpdateTeamMemberForm):
     
     def __init__(self, *args, **kwargs):
@@ -80,6 +86,7 @@ class UpdateTeamLeaderForm(UpdateTeamMemberForm):
         
         for field_name in ['first_name', 'last_name']:
             self.fields[field_name].disabled = True
+
 
 class ConnectTeamLeaderForm(ModelForm):
     leader = TeamLeaderChoiceField(
@@ -98,6 +105,7 @@ class ConnectTeamLeaderForm(ModelForm):
             'leader',
         ]
 
+
 class SchoolsGuardianForm(Form):
     schools = SchoolGuardianMultipleChoiceField(
         queryset=None,
@@ -110,6 +118,7 @@ class SchoolsGuardianForm(Form):
 
         self.fields['schools'].queryset = School.objects.filter(accepted=True).order_by(Lower('name'))
         self.initial['schools'] = self.request.user.schools.all()
+
 
 class TeamsAddFile(ModelForm):
     valid_extensions = [

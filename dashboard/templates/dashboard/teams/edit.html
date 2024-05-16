@@ -55,6 +55,17 @@
                                             </div>
                                         </div>
                                         {% if perms.dashboard.change_team %}
+                                        {% if form.guardian_confirmation %}
+                                        <div class="form-row">
+                                            <div class="col-md-12 mb-3">
+                                                <div class="custom-control custom-checkbox">
+                                                    {{ form.guardian_confirmation }}
+                                                    <label class="custom-control-label" for="{{ form.guardian_confirmation.id_for_label }}">Potwierdzenie opiekuna</label>
+                                                </div>
+                                                <div class="text-danger">{{ form.guardian_confirmation.errors }}</div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
                                         <div class="form-row">
                                             <div class="col-md-12 mb-3">
                                                 <div class="custom-control custom-checkbox">

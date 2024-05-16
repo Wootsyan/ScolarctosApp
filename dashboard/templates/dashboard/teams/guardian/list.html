@@ -50,7 +50,7 @@
                                                 {% endif %}
                                             </td>                                            
                                             <td>
-                                                {% if team.team_guardian and team.team_guardian.guardian.confirmation %}
+                                                {% if team.team_guardian and team.team_guardian.confirmation %}
                                                 <i title="Tak" class="fa fa-circle text-success"></i>
                                                 {% else %}
                                                 <i title="Nie" class="fa fa-circle text-danger"></i>
@@ -68,9 +68,11 @@
                                                     <a href="{% url "dashboard:teams-detail" team.id %}" class="btn btn-info" role="button" aria-pressed="true">
                                                         <i class="ti-info"></i>
                                                     </a>
+                                                    {% if team.editable %}
                                                     <a href="{% url "dashboard:teams-guardian-disconnect" team.team_guardian.id %}" class="btn btn-danger" role="button" aria-pressed="true">
                                                         <i class="fa fa-close"></i>
                                                     </a>
+                                                    {% endif %}
                                                 </div>
                                             </td>
                                         </tr>

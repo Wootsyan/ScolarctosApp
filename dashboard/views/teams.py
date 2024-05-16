@@ -1,12 +1,11 @@
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView, FormMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
-
 from dashboard.utils import generate_team_member_email
 from dashboard.models import Team, TeamGuardian
 from dashboard.forms import CreateTeamForm, CreateTeamMemberForm, UpdateTeamMemberForm, UpdateTeamLeaderForm, ConnectTeamLeaderForm, TeamsAddFile, UpdateTeamForm
@@ -30,6 +29,7 @@ class TeamsListView(PermissionRequiredMixin, ListView):
         context['page_name'] = 'Zespoły'
         return context
     
+
 @method_decorator(login_required, name='dispatch')
 class TeamsDetailView(PermissionRequiredMixin, FormMixin, DetailView):
     model = Team
@@ -78,6 +78,7 @@ class TeamsDetailView(PermissionRequiredMixin, FormMixin, DetailView):
     def get_success_url(self):
         kwargs = {'pk': self.object.id}
         return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
+
 
 @method_decorator(login_required, name='dispatch')
 class TeamsCreateView(PermissionRequiredMixin, CreateView):
@@ -139,10 +140,14 @@ class TeamsUpdateView(PermissionRequiredMixin, UpdateView):
             disconnect_guardian = bool(int(form.cleaned_data['guardian']))
         else:
             disconnect_guardian = False
+
         self.object = form.save()
         #Hidden editable field is default False
         if self.request.user == self.object.leader:
             self.object.editable = True
+        if 'guardian_confirmation' in form.cleaned_data:
+            self.object.team_guardian.confirmation = form.cleaned_data['guardian_confirmation']
+            self.object.team_guardian.save()
         self.object.save()
         if disconnect_guardian:
             self.object.team_guardian.delete()
@@ -192,7 +197,8 @@ class TeamsDeleteView(PermissionRequiredMixin, DeleteView):
             return reverse_lazy('dashboard:index')
         else:
             return reverse_lazy('dashboard:teams-list')
-        
+
+
 @method_decorator(login_required, name='dispatch')
 class TeamsMembersCreateView(PermissionRequiredMixin, SingleObjectMixin, FormView):
     model = Team
@@ -229,7 +235,8 @@ class TeamsMembersCreateView(PermissionRequiredMixin, SingleObjectMixin, FormVie
         self.team = self.get_object()
         kwargs = {'pk': self.team.id}
         return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
-    
+
+
 @method_decorator(login_required, name='dispatch')
 class TeamsMembersUpdateView(PermissionRequiredMixin, UpdateView):
     model = CustomUser
@@ -265,6 +272,7 @@ class TeamsMembersUpdateView(PermissionRequiredMixin, UpdateView):
         self.team = self.get_object().team_members.first()
         kwargs = {'pk': self.team.id}
         return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
+
 
 @method_decorator(login_required, name='dispatch')
 class TeamsMembersDeleteView(PermissionRequiredMixin, DeleteView):
@@ -330,6 +338,7 @@ class TeamsLeaderDisconnectView(PermissionRequiredMixin, DeleteView):
         kwargs = {'pk': self.team.id}
         return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
     
+
 @method_decorator(login_required, name='dispatch')
 class TeamsLeaderUpdateView(PermissionRequiredMixin, UpdateView):
     model = CustomUser
@@ -370,6 +379,7 @@ class TeamsLeaderUpdateView(PermissionRequiredMixin, UpdateView):
         kwargs = {'pk': self.team.id}
         return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
     
+
 @method_decorator(login_required, name='dispatch')
 class TeamsLeaderConnectView(PermissionRequiredMixin, UpdateView):
     model = Team
@@ -400,6 +410,7 @@ class TeamsLeaderConnectView(PermissionRequiredMixin, UpdateView):
         self.team = self.get_object()
         kwargs = {'pk': self.team.id}
         return reverse_lazy('dashboard:teams-detail', kwargs=kwargs)
+
 
 @method_decorator(login_required, name='dispatch')
 class TeamsFileDeleteView(PermissionRequiredMixin, DeleteView):
@@ -462,6 +473,7 @@ class TeamsGuardianView(PermissionRequiredMixin, ListView):
     
     def has_permission(self):
         return self.request.user.is_guardian()
+    
     
 @method_decorator(login_required, name='dispatch')
 class TeamsGuardianDisconnectView(PermissionRequiredMixin, DeleteView):
