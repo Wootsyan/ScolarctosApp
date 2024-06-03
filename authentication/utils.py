@@ -46,7 +46,7 @@ def send_verification_mail(to_user):
     plain_message = strip_tags(html_message)
     try:
         mail = EmailMultiAlternatives(
-            subject="Potwierdź swoje konto - Zespół Koala",
+            subject="Potwierdź swoje konto - Zespół Scolarctos",
             body=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=[to_user.email],
@@ -71,7 +71,7 @@ def send_reset_password_mail(to_user):
     plain_message = strip_tags(html_message)
     try:
         mail = EmailMultiAlternatives(
-            subject="Reset hasła - Zespół Koala",
+            subject="Reset hasła - Zespół Scolarctos",
             body=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=[to_user.email],
@@ -92,7 +92,7 @@ def send_confirmation_code_mail(to_user, confirmation_code):
     plain_message = strip_tags(html_message)
     try:
         mail = EmailMultiAlternatives(
-            subject="Potwierdź dostęp do adresu e-mail - Zespół Koala",
+            subject="Potwierdź dostęp do adresu e-mail - Zespół Scolarctos",
             body=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=[to_user.email],
