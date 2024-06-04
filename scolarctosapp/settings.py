@@ -1,4 +1,8 @@
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -8,15 +12,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%^p4c=91nfd%@bac*l43eht(n7z@0*ez!xb+c$q45+!df@lerl'
-VERIFICATION_EXPIRE_MINUTES = 60
+SECRET_KEY = os.getenv('SECRET_KEY')
+VERIFICATION_EXPIRE_MINUTES = os.getenv('VERIFICATION_EXPIRE_MINUTES')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
 SITE_URL = 'http://127.0.0.1:8000'
 ALLOWED_HOSTS = []
-SITE_DOMAIN = 'koala.pl'
+SITE_DOMAIN = os.getenv('SITE_DOMAIN')
 
 
 # Application definition
@@ -70,11 +74,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'scolarctosapp.wsgi.application'
 
 # Email
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = 'acb3c1bb87fb7a'
-EMAIL_HOST_PASSWORD = '7c3666c0343030'
-EMAIL_PORT = '2525'
-DEFAULT_FROM_EMAIL = 'admin@koala.pl'
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -82,11 +86,11 @@ DEFAULT_FROM_EMAIL = 'admin@koala.pl'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "koaladb",
-        "USER": "koala",
-        "PASSWORD": "koala",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": os.getenv('DB_NAME'),
+        "USER": os.getenv('DB_USER'),
+        "PASSWORD": os.getenv('DB_PASSWORD'),
+        "HOST": os.getenv('DB_HOST'),
+        "PORT": os.getenv('DB_PORT'),
     }
 }
 
